@@ -1,0 +1,6 @@
+httpx
+bs4
+lxml
+Pillow
+numpy
+python-dotenv
