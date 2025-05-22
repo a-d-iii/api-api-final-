@@ -44,7 +44,7 @@ class VtopClient:
         if len(username) < 5 or any(c in string.punctuation for c in username):
             raise VtopLoginError("Invalid username format for VtopClient.", status_code=400)
 
-        self.username = username
+        self.username = username.upper()
         self.password = password
         self._client = httpx.AsyncClient(timeout=30.0, follow_redirects=True, )
         self._logged_in_student: LoggedInStudent | None = None
