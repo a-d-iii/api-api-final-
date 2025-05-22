@@ -126,7 +126,7 @@ async def login_main(
 # These would call the corresponding functions from other files (profile.py etc.)
 
 async def main():
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
         result = await login_main(
             client=client,
             username="23BCE7625",
