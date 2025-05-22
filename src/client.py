@@ -1,138 +1,107 @@
+import string
 import httpx
 import asyncio
-from src.login.prelogin import fetch_csrf_token, pre_login
-from src.login.captcha_solver import fetch_captcha, solve_captcha
-from src.login import login
 
-async def login_main(
+from src.exceptions.exception import (
+    VtopLoginError,
+    VtopCaptchaError,
+    VtopConnectionError,
+    VtopSessionError,
+    VitapVtopClientError
+)
+
+from src.login.fetch_csrf_token import fetch_csrf_token
+from src.login.model.logged_in_student_model import LoggedInStudent
+from src.login.prelogin import pre_login
+from src.login.fetch_captcha import fetch_captcha
+from src.utils.solve_captcha import solve_captcha
+from src.login.student_login import student_login
+
+
+async def login(
     client: httpx.AsyncClient,
     username: str,
     password: str,
     max_retries: int = 3,
-    captcha_retries: int = 2 # Retries specifically for captcha solving within one login attempt
-) -> dict: # Return dict containing auth details and maybe user info later
+    captcha_retries: int = 5
+) -> LoggedInStudent:
     """
     Performs the full VTOP login sequence asynchronously.
-
-    Args:
-        client: The httpx.AsyncClient instance to use.
-        username: VTOP username (registration number).
-        password: VTOP password.
-        max_retries: Maximum attempts for the overall login process (including captcha issues).
-        captcha_retries: Maximum attempts to solve the captcha within a single login attempt.
-
-    Returns:
-        dict: A dictionary containing authentication details (e.g., username, csrf_token)
-              and potentially other initial user info fetched after login.
-              Example: {"username": "...", "csrf_token": "...", "message": "..."}
-
-    Raises:
-        ValueError: If input credentials are invalid or format is wrong.
-        httpx.RequestError: If a network error prevents communication with VTOP.
-        RuntimeError: If VTOP returns a persistent error or internal logic fails.
-        Exception: For any other unexpected errors.
+    Raises descriptive exceptions on failure.
     """
     if not username or not password:
-         raise ValueError("Username and password are required.")
-    if len(username) < 5:
-         # Basic validation based on original handle_login, refine as needed
-         raise ValueError("Invalid username format.")
-
+        raise VtopLoginError("Username and password are required.", status_code=400)
+    if len(username) < 5 or any(c in string.punctuation for c in username):
+        raise VtopLoginError("Invalid username format.", status_code=400)
 
     for attempt in range(max_retries):
         print(f"Overall login attempt {attempt + 1}/{max_retries} for user {username}")
         try:
-            # 1. Fetch initial CSRF token
-            # fetch_csrf_token already has retries internally now
+            # Step 1: Fetch initial CSRF token
             csrf_token = await fetch_csrf_token(client)
             print(f"CSRF TOKEN: {csrf_token}")
-            # fetch_csrf_token raises ValueError if not found after retries
 
-            # 2. Perform pre-login (might require the fetched CSRF token)
+            # Step 2: Pre-login setup
             await pre_login(client, csrf_token)
-            # pre_login raises exceptions on failure
 
-            # 3. Fetch and Solve CAPTCHA
-            # fetch_and_display_captcha already has retries internally now
-            captcha_base64 = await fetch_captcha(client)
-            # fetch_and_display_captcha raises ValueError if not found after retries
-
-            # Solve captcha (synchronous CPU-bound task)
-            # Run in a thread pool to avoid blocking the event loop
+            # Step 3: Fetch and solve CAPTCHA
+            captcha_base64 = await fetch_captcha(client, retries=captcha_retries)
             captcha_value = await asyncio.to_thread(solve_captcha, captcha_base64)
 
-            if not captcha_value: # Check if solver failed or returned None
-                 print("Captcha solver failed to produce a valid value.")
-                 # This is a critical step, if solving fails, retry the whole login sequence (get new captcha)
-                 raise ValueError("Failed to solve captcha.")
-
+            if not captcha_value:
+                raise VtopCaptchaError("Failed to solve captcha.", status_code=422)
 
             print(f"Solved captcha: {captcha_value}")
 
-            # 4. Attempt actual login
-            # perform_login handles VTOP's responses and raises specific exceptions
-            login_result = await login.login(
+            # Step 4: Attempt login
+            login_result = await student_login(
                 client, csrf_token, username, password, captcha_value
             )
 
-            # If perform_login returns successfully, it means login worked
-            # It also already fetches the post-login CSRF token
-            # Return the necessary details from the result dictionary
-            return {
-                "username": username, # Keep track of the logged-in username
-                "csrf_token": login_result["post_login_csrf"], # This is the CSRF needed for subsequent calls
-                "message": login_result["message"] # Success message
-                # Add any other crucial info returned by perform_login or fetched immediately after login
-            }
+            return login_result
 
+        except VtopCaptchaError as e:
+            print(f"Captcha error: {e}")
+            if attempt < max_retries - 1:
+                print("Retrying entire login due to captcha error...")
+                await asyncio.sleep(2 ** attempt)
+                continue
+            raise
 
-        except (httpx.RequestError, ValueError, RuntimeError) as e:
-            # Catch specific exceptions raised by the steps
-            print(f"Error during overall login attempt {attempt + 1}: {e}")
+        except VtopLoginError as e:
+            print(f"Login failed due to credentials or format: {e}")
+            raise  # No point retrying invalid inputs
 
-            # Decide based on error type if retrying is appropriate
-            # Network errors or VTOP internal errors (RuntimeError) are good candidates for retry
-            # Invalid credentials or persistent "captcha not found" (ValueErrors) usually mean no point retrying the same inputs
-            if isinstance(e, ValueError) and ("credentials" in str(e).lower() or "captcha" in str(e).lower()):
-                 # Specific input errors - do not retry with same input
-                 raise e # Re-raise the specific error immediately
-            elif attempt < max_retries - 1:
-                print("Retrying login sequence...")
-                await asyncio.sleep(2**attempt) # Exponential backoff delay
-                continue # Go to the next overall attempt
-            else:
-                print(f"Max overall retries reached. Login failed for user {username}.")
-                raise e # Re-raise the last error
+        except VtopConnectionError as e:
+            print(f"Connection error during login: {e}")
+            if attempt < max_retries - 1:
+                print("Retrying login sequence due to connection error...")
+                await asyncio.sleep(2 ** attempt)
+                continue
+            raise
 
+        except VtopSessionError as e:
+            print(f"Session error (e.g., CSRF/session expired): {e}")
+            if attempt < max_retries - 1:
+                print("Retrying login sequence due to session error...")
+                await asyncio.sleep(2 ** attempt)
+                continue
+            raise
+
+        except VitapVtopClientError as e:
+            print(f"Other known VTOP client error: {e}")
+            if attempt < max_retries - 1:
+                print("Retrying login sequence due to client error...")
+                await asyncio.sleep(2 ** attempt)
+                continue
+            raise
 
         except Exception as e:
-             # Catch any other unexpected errors
-             print(f"An unexpected error occurred during overall login attempt {attempt + 1}: {e}")
-             if attempt < max_retries - 1:
+            print(f"Unexpected error during login: {e}")
+            if attempt < max_retries - 1:
                 print("Retrying login sequence due to unexpected error...")
-                await asyncio.sleep(2**attempt) # Exponential backoff delay
-                continue # Go to the next overall attempt
-             else:
-                print(f"Max overall retries reached. Login failed for user {username}.")
-                raise Exception(f"Login failed after {max_retries} attempts due to unexpected error: {e}") from e
+                await asyncio.sleep(2 ** attempt)
+                continue
+            raise RuntimeError(f"Login failed after {max_retries} attempts due to unexpected error: {e}") from e
 
-
-    # This point should ideally not be reached if all attempts raise exceptions
-    raise RuntimeError(f"Login process completed without success or clear failure reason for user {username}.")
-
-
-# You might add other top-level functions here later
-# e.g., async def get_profile(client: httpx.AsyncClient, username: str, csrf_token: str) -> dict: ...
-# These would call the corresponding functions from other files (profile.py etc.)
-
-async def main():
-    async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-        result = await login_main(
-            client=client,
-            username="23BCE7625",
-            password="g4st=sTevi"
-        )
-        print(result)
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    raise RuntimeError(f"Login failed for user {username} after {max_retries} attempts.")

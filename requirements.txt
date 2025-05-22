@@ -4,3 +4,4 @@ lxml
 Pillow
 numpy
 python-dotenv
+pydantic
