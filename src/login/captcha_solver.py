@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 import httpx
 import importlib.resources
+import asyncio
 
 from src.constants import VTOP_LOGIN_URL, HEADERS
 from src.utils import find_captcha
@@ -98,26 +99,14 @@ async def fetch_captcha(client: httpx.AsyncClient, retries=MAX_RETRIES_FETCH) ->
 def partition_img(img: np.ndarray) -> list[np.ndarray]:
     """Partitions the captcha image into 6 character images."""
     parts = []
-    # These coordinates are hardcoded based on the specific captcha structure.
-    # If the captcha image layout changes, these coordinates will need updating.
-    # A more robust approach would involve image analysis to find bounding boxes.
     try:
         for i in range(6):
-            # Original coordinates from the "before" code
             x1 = (i + 1) * 25 + 2
             y1 = 7 + 5 * (i % 2) + 1
             x2 = (i + 2) * 25 + 1
             y2 = 35 - 5 * ((i + 1) % 2)
-
-            # Ensure coordinates are within image bounds
-            y1 = max(0, y1)
-            y2 = min(img.shape[0], y2)
-            x1 = max(0, x1)
-            x2 = min(img.shape[1], x2)
-
+            # select the bounding box 
             part = img[y1:y2, x1:x2]
-            if part.size == 0:
-                raise ValueError(f"Partition {i} resulted in an empty image.")
             parts.append(part)
         return parts
     except Exception as e:
@@ -128,12 +117,26 @@ def partition_img(img: np.ndarray) -> list[np.ndarray]:
 # Synchronous function as it's CPU-bound
 def convert_to_abs_bw(img: np.ndarray) -> np.ndarray:
     """Converts an image part to absolute black and white based on average pixel value."""
-    # This is a very simple thresholding method. May not work well for all captcha variations.
-    # More advanced methods (e.g., adaptive thresholding) might be needed.
     if img.size == 0:
         raise ValueError("Cannot process empty image part.")
-    avg = np.sum(img) / img.size
-    return np.where(img > avg, 0, 1).astype(np.float64) # Ensure float type for ML model input
+    avg = np.sum(img)
+    avg /= 24 * 22
+    return np.where(img > avg, 0, 1)
+
+def _solve_captcha_ml(img: list[np.ndarray]) -> str | None:
+    LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    captcha = ""
+    for single_letter in img:
+        dw_img = convert_to_abs_bw(single_letter)
+        dw_img = dw_img.flatten()
+        x = np.dot(dw_img, weights) + biases
+        x = np.exp(x)
+        captcha += LETTERS[np.argmax(x)]
+    if len(captcha) != 6:
+        print(f"Warning: Captcha solving resulted in unexpected output: {captcha}")
+        # Decide if this counts as a total failure. For now, return None.
+        return None
+    return captcha
 
 # Synchronous function as it's CPU-bound
 def solve_captcha(captcha_base64: str) -> str | None:
@@ -153,50 +156,10 @@ def solve_captcha(captcha_base64: str) -> str | None:
 
     try:
         img = _str_to_img(captcha_base64)
-        # Optional: Apply convert_to_abs_bw here if the ML model expects it as preprocessing
-        img = convert_to_abs_bw(img)
+        # Optional: Apply convert_to_abs_bw here
+        # img = convert_to_abs_bw(img)
         parts = partition_img(img)
-
-        # Process each part
-        captcha_text = ""
-        for part in parts:
-             # Ensure consistent processing and flattening as expected by the model
-             processed_part = convert_to_abs_bw(part) # Apply BW conversion here
-             flattened_part = processed_part.flatten()
-
-             # Ensure flattened data matches model input size
-             # This depends on the expected size of the partitioned character image after BW conversion
-             # Based on original code/coordinates, it seems expected size is around 24*22=528?
-             expected_size = weights.shape[0] # Input layer size
-             if flattened_part.shape[0] != expected_size:
-                 print(f"Warning: Flattened part size {flattened_part.shape[0]} does not match expected model input size {expected_size}. Skipping.")
-                 captcha_text += "?" # Indicate a failure for this character
-                 continue # Move to the next character part if possible
-
-             # Predict character using the model
-             x = np.dot(flattened_part, weights) + biases
-             # Assuming output layer corresponds to LETTERS indices
-             LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" # Ensure this matches your model training labels
-             predicted_char_index = np.argmax(x)
-
-             # Optional: Confidence check
-             # max_output_value = np.max(x)
-             # if max_output_value < SOME_THRESHOLD:
-             #     captcha_text += "?" # Or some indicator of low confidence
-             # else:
-             #     captcha_text += LETTERS[predicted_char_index]
-
-             captcha_text += LETTERS[predicted_char_index] # Append predicted character
-
-
-        # Basic validation: Check if we got 6 characters
-        if len(captcha_text) != 6 or "?" in captcha_text:
-             print(f"Warning: Captcha solving resulted in unexpected output: {captcha_text}")
-             # Decide if this counts as a total failure. For now, return None.
-             return None
-
-
-        return captcha_text
+        return _solve_captcha_ml(parts)
 
     except ValueError as e:
         print(f"Captcha solving failed due to image processing error: {e}")
@@ -216,6 +179,3 @@ def _str_to_img(src: str) -> np.ndarray:
     except Exception as e:
         print(f"Error decoding base64 to image: {e}")
         raise ValueError(f"Failed to decode base64 to image: {e}") from e
-
-# Add these imports if not already present (likely needed by the above code)
-import asyncio # Need asyncio for sleep in async functions

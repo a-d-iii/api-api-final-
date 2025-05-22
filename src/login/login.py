@@ -1,5 +1,5 @@
 import httpx
-from src.constants import VTOP_LOGIN_URL, VTOP_CONTENT_URL, VTOP_LOGIN_ERROR_URL, HEADERS
+from src.constants import VTOP_LOGIN_ERROR_ROUTE, VTOP_LOGIN_INIT_ROUTE, VTOP_LOGIN_URL, VTOP_CONTENT_URL, VTOP_LOGIN_ERROR_URL, HEADERS
 from src.utils import find_login_response
 from src.utils import find_csrf 
 
@@ -10,7 +10,7 @@ async def login(
     username: str,
     password: str,
     captcha_value: str,
-) -> dict: # Changed return type to dict on success, raise on failure
+) -> dict | None: # Changed return type to dict on success, raise on failure
     """
     Attempts to log in to the VTOP system using provided credentials and captcha.
 
@@ -41,24 +41,33 @@ async def login(
         response = await client.post(VTOP_LOGIN_URL, data=data, headers=HEADERS)
         print(response.text)
         print(response.url)
+        print(response.cookies)
+        print(response.headers.get("Location"))
         # Don't raise_for_status immediately
         final_url = response.url
 
-        if (response.status_code < 400):
-            print(f"Login successful for user {username}. Redirected to content page.")
-            # After successful login, we need to get the CSRF token from the content page
-            # for subsequent requests.
-            content_resp = await client.get(VTOP_CONTENT_URL, headers=HEADERS)
-            print(content_resp.text)
-            print(content_resp.url)
+        if (response.has_redirect_location):
+            print(response.headers.get("Location"))
+            if(response.headers.get("Location") == VTOP_LOGIN_INIT_ROUTE):
+                print(f"Login successful for user {username}. Redirected to content page.")
+                # After successful login, we need to get the CSRF token from the content page
+                # for subsequent requests.
+                content_resp = await client.get(VTOP_CONTENT_URL, headers=HEADERS)
+                print(content_resp.text)
+                print(content_resp.url)
 
-            post_login_csrf = find_csrf.find_csrf(content_resp.text)
+                post_login_csrf = find_csrf.find_csrf(content_resp.text)
 
-            if post_login_csrf is None:
-                 # This is a critical failure: login succeeded but couldn't get the necessary token for later
-                 raise RuntimeError("Login successful, but failed to find post-login CSRF token.")
+                if post_login_csrf is None:
+                    # This is a critical failure: login succeeded but couldn't get the necessary token for later
+                    raise RuntimeError("Login successful, but failed to find post-login CSRF token.")
 
-            return {"success": True, "message": f"Logged in Successfully as {username}", "post_login_csrf": post_login_csrf}
+                return {"success": True, "message": f"Logged in Successfully as {username}", "post_login_csrf": post_login_csrf}
+            elif(response.status_code == 302 and (response.headers.get("Location") == VTOP_LOGIN_ERROR_ROUTE)):
+                response = await client.get(VTOP_LOGIN_ERROR_URL, headers=HEADERS)
+                error_message = find_login_response.login_error_identifier(response.text)
+                print(f"Err: ${error_message}")
+                ValueError(f"Login Credential Error: ${error_message}")
 
         elif  (response.status_code == 404): #final_url.startswith(VTOP_LOGIN_ERROR_URL) or
             # Check for the specific error page or a 404 on the login URL itself

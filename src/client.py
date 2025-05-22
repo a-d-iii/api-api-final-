@@ -45,7 +45,7 @@ async def login_main(
             # 1. Fetch initial CSRF token
             # fetch_csrf_token already has retries internally now
             csrf_token = await fetch_csrf_token(client)
-            print(f"CSRF TOKEN: ${csrf_token}")
+            print(f"CSRF TOKEN: {csrf_token}")
             # fetch_csrf_token raises ValueError if not found after retries
 
             # 2. Perform pre-login (might require the fetched CSRF token)
@@ -129,7 +129,7 @@ async def main():
     async with httpx.AsyncClient(timeout=30.0) as client:
         result = await login_main(
             client=client,
-            username="23BCE7626",
+            username="23BCE7625",
             password="g4st=sTevi"
         )
         print(result)

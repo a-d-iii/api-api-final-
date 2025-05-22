@@ -81,11 +81,14 @@ async def pre_login(client: httpx.AsyncClient, csrf_token: str) -> None:
     """
     try:
         data = {'_csrf': csrf_token, 'flag': 'VTOP'}
-        # Use await client.post
         response = await client.post(VTOP_PRELOGIN_URL, data=data, headers=HEADERS)
+        print(f"Pre-Login Redirect URL: ${response.url}")
+        print(response.headers.get("Location"))
 
-        if(response.status_code < 400):
-            print("Pre-login successful.")
+        if(response.has_redirect_location):
+            if((response.headers.get("Location") == 'https://vtop.vitap.ac.in/vtop/init/page')):
+                print("Pre-login successful.")
+                print(f"Pre-Login Redirect URL: ${response.url}")
 
     except httpx.RequestError as e:
         print(f"Pre-login request failed unexpectedly: {e}")

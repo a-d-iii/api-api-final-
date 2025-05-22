@@ -7,6 +7,10 @@ HEADERS = {
 VTOP_BASE_URL = "https://vtop.vitap.ac.in"
 VTOP_URL = "https://vtop.vitap.ac.in/vtop/open/page"
 
+# Routes
+VTOP_LOGIN_INIT_ROUTE = "/vtop/init/page"
+VTOP_LOGIN_ERROR_ROUTE = "/vtop/login/error"
+
 # Login Page URL
 VTOP_PRELOGIN_URL = "https://vtop.vitap.ac.in/vtop/prelogin/setup"
 VTOP_PRELOGIN_INIT_URL = "https://vtop.vitap.ac.in/vtop/init/page"
