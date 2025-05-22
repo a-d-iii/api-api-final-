@@ -1,1 +1,1 @@
-from .client import login
+from .client import VtopClient
