@@ -1,5 +1,5 @@
 import httpx
-from src.constants import VTOP_LOGIN_ERROR_ROUTE, VTOP_LOGIN_URL, VTOP_CONTENT_URL, HEADERS
+from src.constants import VTOP_LOGIN_ERROR_URL, VTOP_LOGIN_URL, VTOP_CONTENT_URL, HEADERS
 from src.exceptions.exception import VtopConnectionError, VtopLoginError
 from src.login.model.logged_in_student_model import LoggedInStudent
 from src.utils import find_login_response
@@ -54,7 +54,7 @@ async def student_login(
             logged_in_student = {"registration_number": registration_number, "post_login_csrf_token": post_login_csrf}
             return LoggedInStudent(**logged_in_student)
 
-        elif(response.url == VTOP_LOGIN_ERROR_ROUTE):
+        elif(response.url == VTOP_LOGIN_ERROR_URL):
             error_message = find_login_response.login_error_identifier(response.text)
             print(f"Login Credential Error: ${error_message}")
             raise VtopLoginError(f"${error_message}", status_code=401) # Unauthorized
@@ -71,6 +71,9 @@ async def student_login(
                 original_exception=e,
                 status_code=502
             )
+    except VtopLoginError as e:
+        raise e 
+    
     except Exception as e:
         print(f"An unexpected error occurred during login process: {e}")
         raise VtopConnectionError(f"An unexpected error occurred during login: {e}") from e

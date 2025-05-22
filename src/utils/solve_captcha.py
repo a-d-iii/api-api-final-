@@ -5,6 +5,8 @@ import numpy as np
 from PIL import Image
 import importlib.resources
 
+from src.exceptions.exception import VtopCaptchaError
+
 try:
     weights_data_str = importlib.resources.read_text('src.resources', 'weights.json')
     model_config = json.loads(weights_data_str)
@@ -43,7 +45,7 @@ def convert_to_abs_bw(img: np.ndarray) -> np.ndarray:
     avg /= 24 * 22
     return np.where(img > avg, 0, 1)
 
-def solve_captcha_ml(img: list[np.ndarray]) -> str | None:
+def solve_captcha_ml(img: list[np.ndarray]) -> str:
     LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
     captcha = ""
     for single_letter in img:
@@ -54,10 +56,10 @@ def solve_captcha_ml(img: list[np.ndarray]) -> str | None:
         captcha += LETTERS[np.argmax(x)]
     if len(captcha) != 6:
         print(f"Warning: Captcha solving resulted in unexpected output: {captcha}")
-        return None
+        raise VtopCaptchaError(f"Warning: Captcha solving resulted in unexpected output: {captcha}")
     return captcha
 
-def solve_captcha(captcha_base64: str) -> str | None:
+def solve_captcha(captcha_base64: str) -> str:
     """
     Solves the given base64 encoded captcha image using the loaded ML model.
 
@@ -65,13 +67,8 @@ def solve_captcha(captcha_base64: str) -> str | None:
         captcha_base64 (str): Base64 encoded captcha image data (excluding prefix).
 
     Returns:
-        str or None: The predicted captcha text, or None if solving fails
-                     or model is not loaded.
+        str: The predicted captcha text.
     """
-    if weights is None or biases is None:
-        print("Captcha solving model not loaded.")
-        return None
-
     try:
         img = _str_to_img(captcha_base64)
         # Optional: Apply convert_to_abs_bw here
@@ -79,12 +76,12 @@ def solve_captcha(captcha_base64: str) -> str | None:
         parts = partition_img(img)
         return solve_captcha_ml(parts)
 
-    except ValueError as e:
-        print(f"Captcha solving failed due to image processing error: {e}")
-        return None
+    except VtopCaptchaError as e:
+        raise e
+
     except Exception as e:
         print(f"An unexpected error occurred during captcha solving: {e}")
-        return None
+        raise VtopCaptchaError(f"An unexpected error occurred during captcha solving: {e}")
 
 
 def _str_to_img(src: str) -> np.ndarray:
