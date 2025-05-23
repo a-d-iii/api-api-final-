@@ -94,6 +94,8 @@ PFP_PATH = "/vtop/users/image/?id="
 
 # Semester Sub ID's
 SemSubID = {
+    "Long Semester 2024-25" : "AP2024256",
+    "Winter Semester 2024-25" : "AP2024254",
     "FALL SEM 2024-25 FRESHERS" : "AP2024253",
     "FALL SEM 2024-25" : "AP2024252",
     "Fall_Win_sem_2024-25" : "AP20232413",
