@@ -2,6 +2,8 @@ import string
 import httpx
 import asyncio
 
+from .constants import VTOP_BASE_URL
+
 from .exceptions import (
     VtopLoginError,
     VtopCaptchaError,
@@ -54,7 +56,7 @@ class VtopClient:
 
         self.username = username.upper()
         self.password = password
-        self._client = httpx.AsyncClient(timeout=30.0, follow_redirects=True, )
+        self._client = httpx.AsyncClient(timeout=30.0, follow_redirects=True, base_url=VTOP_BASE_URL)
         self._logged_in_student: LoggedInStudent | None = None
         self.max_login_retries = max_login_retries
         self.captcha_retries = captcha_retries

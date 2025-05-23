@@ -1,5 +1,5 @@
 import httpx
-from src.constants import VTOP_LOGIN_ERROR_URL, VTOP_LOGIN_URL, VTOP_CONTENT_URL, HEADERS
+from src.constants import VTOP_BASE_URL, VTOP_LOGIN_ERROR_URL, VTOP_LOGIN_URL, VTOP_CONTENT_URL, HEADERS
 from src.exceptions.exception import VtopConnectionError, VtopLoginError
 from src.login.model.logged_in_student_model import LoggedInStudent
 from src.utils import find_login_response
@@ -43,7 +43,7 @@ async def student_login(
         response = await client.post(VTOP_LOGIN_URL, data=data, headers=HEADERS)
         print(response.url)
 
-        if (response.url == VTOP_CONTENT_URL):
+        if (response.url == VTOP_BASE_URL+VTOP_CONTENT_URL):
             print(f"Login successful for user {registration_number}. Redirected to content page.")
             # After successful login, we need to get the new CSRF token from the content page
             # for subsequent requests.
@@ -53,7 +53,7 @@ async def student_login(
             logged_in_student = {"registration_number": registration_number, "post_login_csrf_token": post_login_csrf}
             return LoggedInStudent(**logged_in_student)
 
-        elif(response.url == VTOP_LOGIN_ERROR_URL):
+        elif(response.url == VTOP_BASE_URL+VTOP_LOGIN_ERROR_URL):
             error_message = find_login_response.login_error_identifier(response.text)
             print(f"Login Credential Error: ${error_message}")
             raise VtopLoginError(f"${error_message}", status_code=401) # Unauthorized

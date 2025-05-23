@@ -5,92 +5,92 @@ HEADERS = {
 
 # Main URL
 VTOP_BASE_URL = "https://vtop.vitap.ac.in"
-VTOP_URL = "https://vtop.vitap.ac.in/vtop/open/page"
+VTOP_URL = "/vtop/open/page"
 
 # Routes
 VTOP_LOGIN_INIT_ROUTE = "/vtop/init/page"
 VTOP_LOGIN_ERROR_ROUTE = "/vtop/login/error"
 
 # Login Page URL
-VTOP_PRELOGIN_URL = "https://vtop.vitap.ac.in/vtop/prelogin/setup"
-VTOP_PRELOGIN_INIT_URL = "https://vtop.vitap.ac.in/vtop/init/page"
-VTOP_LOGIN_URL = "https://vtop.vitap.ac.in/vtop/login"
-VTOP_LOGIN_INIT_URL = "https://vtop.vitap.ac.in/vtop/init/page"
-VTOP_LOGIN_ERROR_URL = "https://vtop.vitap.ac.in/vtop/login/error"
+VTOP_PRELOGIN_URL = "/vtop/prelogin/setup"
+VTOP_PRELOGIN_INIT_URL = "/vtop/init/page"
+VTOP_LOGIN_URL = "/vtop/login"
+VTOP_LOGIN_INIT_URL = "/vtop/init/page"
+VTOP_LOGIN_ERROR_URL = "/vtop/login/error"
 
 # Home Page URL
-VTOP_HOME_URL = "https://vtop.vitap.ac.in/vtop/home"
+VTOP_HOME_URL = "/vtop/home"
 
 # Content Page URL
-VTOP_CONTENT_URL = "https://vtop.vitap.ac.in/vtop/content"
+VTOP_CONTENT_URL = "/vtop/content"
 
 # Profile URL
-PROFILE_URL = "https://vtop.vitap.ac.in/vtop/studentsRecord/StudentProfileAllView"
-STUDENT_IMAGE_UPLOAD_URL = "https://vtop.vitap.ac.in/vtop/others/photo/getStudentIdPhotoAndSign1"
+PROFILE_URL = "/vtop/studentsRecord/StudentProfileAllView"
+STUDENT_IMAGE_UPLOAD_URL = "/vtop/others/photo/getStudentIdPhotoAndSign1"
 
 
 # Biometric Log URL
-BIOMETRIC_LOG_URL = "https://vtop.vitap.ac.in/vtop/academics/biometriclogdisplay"
-GET_BIOMETRIC_LOG_URL = "https://vtop.vitap.ac.in/vtop/getStudBioHistory"
+BIOMETRIC_LOG_URL = "/vtop/academics/biometriclogdisplay"
+GET_BIOMETRIC_LOG_URL = "/vtop/getStudBioHistory"
 
 # Proctor Details URL
-MENTOR_DETAILS_URL = "https://vtop.vitap.ac.in/vtop/proctor/viewProctorDetails"
+MENTOR_DETAILS_URL = "/vtop/proctor/viewProctorDetails"
 
 # HOD Details URL
-HOD_DETAILS_URL = "https://vtop.vitap.ac.in/vtop/hrms/viewHodDeanDetails"
+HOD_DETAILS_URL = "/vtop/hrms/viewHodDeanDetails"
 
 # Payment URL
-PAYMENTS_URL = "https://vtop.vitap.ac.in/vtop/finance/Payments"
-PAYMENT_RECEIPT_URL = "https://vtop.vitap.ac.in/vtop/p2p/getReceiptsApplno"
-PRINT_PAYMENT_RECEIPT_URL = "https://vtop.vitap.ac.in/vtop/finance/dupReceiptNewP2P"
-VIRTUAL_ACCOUNT_URL = "https://vtop.vitap.ac.in/vtop/admissions/studentVirtualAccountNo "
+PAYMENTS_URL = "/vtop/finance/Payments"
+PAYMENT_RECEIPT_URL = "/vtop/p2p/getReceiptsApplno"
+PRINT_PAYMENT_RECEIPT_URL = "/vtop/finance/dupReceiptNewP2P"
+VIRTUAL_ACCOUNT_URL = "/vtop/admissions/studentVirtualAccountNo "
 
 # Curriculum URL
-CURRICULUM_URL = "https://vtop.vitap.ac.in/vtop/academics/common/Curriculum"
+CURRICULUM_URL = "/vtop/academics/common/Curriculum"
 
 # Time Table URL
-TIME_TABLE_URL = "https://vtop.vitap.ac.in/vtop/academics/common/StudentTimeTable"
-GET_TIME_TABLE_URL = "https://vtop.vitap.ac.in/vtop/processViewTimeTable"
+TIME_TABLE_URL = "/vtop/academics/common/StudentTimeTable"
+GET_TIME_TABLE_URL = "/vtop/processViewTimeTable"
 
 # Exam Schedule URL
-EXAM_SCHEDULE_URL = "https://vtop.vitap.ac.in/vtop/examinations/StudExamSchedule"
-GET_EXAM_SCHEDULE_URL = "https://vtop.vitap.ac.in/vtop/examinations/doSearchExamScheduleForStudent"
+EXAM_SCHEDULE_URL = "/vtop/examinations/StudExamSchedule"
+GET_EXAM_SCHEDULE_URL = "/vtop/examinations/doSearchExamScheduleForStudent"
 
 
 # Attendance URL
-ATTENDANCE_URL = "https://vtop.vitap.ac.in/vtop/academics/common/StudentAttendance"
-VIEW_ATTENDANCE_URL = "https://vtop.vitap.ac.in/vtop/processViewStudentAttendance"
+ATTENDANCE_URL = "/vtop/academics/common/StudentAttendance"
+VIEW_ATTENDANCE_URL = "/vtop/processViewStudentAttendance"
 
 # Course Page URL
-COURSE_PAGE_URL = "https://vtop.vitap.ac.in/vtop/academics/common/StudentCoursePage"
+COURSE_PAGE_URL = "/vtop/academics/common/StudentCoursePage"
 
 # Makrs URL
-MARKS_URL = "https://vtop.vitap.ac.in/vtop/examinations/StudentMarkView"
-VIEW_MARKS_URL = "https://vtop.vitap.ac.in/vtop/examinations/doStudentMarkView"
+MARKS_URL = "/vtop/examinations/StudentMarkView"
+VIEW_MARKS_URL = "/vtop/examinations/doStudentMarkView"
 
 # Grades URL
-GRADE_HISTORY_URL = "https://vtop.vitap.ac.in/vtop/examinations/examGradeView/StudentGradeHistory"
+GRADE_HISTORY_URL = "/vtop/examinations/examGradeView/StudentGradeHistory"
 
 
 # Weekend Outing URL
-WEEKEND_OUTING_URL = "https://vtop.vitap.ac.in/vtop/hostel/StudentWeekendOuting"
-SAVE_WEEKEND_OUTING_URL = "https://vtop.vitap.ac.in/vtop/hostel/saveOutingForm"
-EDIT_WEEKEND_OUTING_FORM = "https://vtop.vitap.ac.in/vtop/hostel/updateBookingInfo"
-DELETE_WEEKEND_OUTING_FORM = "https://vtop.vitap.ac.in/vtop/hostel/deleteBookingInfo"
+WEEKEND_OUTING_URL = "/vtop/hostel/StudentWeekendOuting"
+SAVE_WEEKEND_OUTING_URL = "/vtop/hostel/saveOutingForm"
+EDIT_WEEKEND_OUTING_FORM = "/vtop/hostel/updateBookingInfo"
+DELETE_WEEKEND_OUTING_FORM = "/vtop/hostel/deleteBookingInfo"
 
 
 # General Outing URL
-GENERAL_OUTING_URL = "https://vtop.vitap.ac.in/vtop/hostel/StudentGeneralOuting"
-SAVE_GENERAL_OUTING_URL = "https://vtop.vitap.ac.in/vtop/hostel/saveGeneralOutingForm"
-EDIT_GENRAL_OUTING_URL = "https://vtop.vitap.ac.in/vtop/hostel/updateGeneralOutingInfo"
-DELETE_GENERAL_OUTING_URL = "https://vtop.vitap.ac.in/vtop/hostel/deleteGeneralOutingInfo"
+GENERAL_OUTING_URL = "/vtop/hostel/StudentGeneralOuting"
+SAVE_GENERAL_OUTING_URL = "/vtop/hostel/saveGeneralOutingForm"
+EDIT_GENRAL_OUTING_URL = "/vtop/hostel/updateGeneralOutingInfo"
+DELETE_GENERAL_OUTING_URL = "/vtop/hostel/deleteGeneralOutingInfo"
 
 
 # NCGPA Rank URL
-NCGPA_RANK_URL = "https://vtop.vitap.ac.in/vtop/hostels/counsellingSlotTimings1"
+NCGPA_RANK_URL = "/vtop/hostels/counsellingSlotTimings1"
 
 # Profile image path
-PFP_PATH = "https://vtop.vitap.ac.in/vtop/users/image/?id="
+PFP_PATH = "/vtop/users/image/?id="
 
 # Semester Sub ID's
 SemSubID = {
