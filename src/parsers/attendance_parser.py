@@ -6,7 +6,7 @@ from src.exceptions.exception import VtopParsingError
 def parse_attendance(html: str) -> list[AttendanceModel]:
     """
     Parses the HTML content of a VIT attendance table and extracts attendance details
-    for each course into a list of dictionaries.
+    for each course into a list of AttendanceModels.
 
     Args:
         html (str): The raw HTML string containing the attendance table.

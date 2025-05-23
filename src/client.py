@@ -2,6 +2,18 @@ import string
 import httpx
 import asyncio
 
+from .exceptions import (
+    VtopLoginError,
+    VtopCaptchaError,
+    VtopConnectionError,
+    VtopSessionError,
+    VitapVtopClientError,
+    VtopCsrfError,
+    VtopAttendanceError,
+    VtopBiometricError,
+    VtopTimetableError,
+)
+
 from .login import (
     fetch_csrf_token,
     pre_login,
@@ -12,20 +24,11 @@ from .login import (
 
 from .utils import solve_captcha
 
-from .attendance import AttendanceModel,fetch_attendance
-from .attendance.model.attendance_model import AttendanceModel
-
+from .attendance import fetch_attendance, AttendanceModel
 from .biometric import fetch_biometric, BiometricModel
+from .timetable import fetch_timetable, TimetableModel
 
-from .exceptions import (
-    VtopLoginError,
-    VtopCaptchaError,
-    VtopConnectionError,
-    VtopSessionError,
-    VitapVtopClientError,
-    VtopAttendanceError,
-    VtopBiometricError,
-)
+
 
 
 
@@ -149,7 +152,7 @@ class VtopClient:
         Fetches biometric data for the given date.
 
         Args:
-            date: The date for which the biometric log is requested, in 'dd-mm-yyyy' format.
+            date: The date for which the biometric log is requested, in 'dd/mm/yyyy' format.
 
         Returns:
             A list containing the parsed biometric data(AttendanceModel).
@@ -162,17 +165,27 @@ class VtopClient:
             csrf_token=logged_in_info.post_login_csrf_token
         )
 
+    
+    async def get_timetable(self, sem_sub_id: str) -> TimetableModel:
+        """
+        Fetches timetable data for the given semester.
+
+        Args:
+            sem_sub_id: The semester subject ID (e.g., "AP2023242").
+
+        Returns:
+            A TimetableModel containing the parsed timetable details.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_timetable(
+            client=self._client,
+            username=logged_in_info.registration_number,
+            semSubID=sem_sub_id,
+            csrf_token=logged_in_info.post_login_csrf_token
+        )
+
     # --- Other VTOP feature methods here ---
     # Example:
-    # async def get_timetable(self, sem_sub_id: str) -> dict:
-    #     logged_in_info = await self._ensure_logged_in()
-    #     return await fetch_timetable_data(
-    #         client=self._client,
-    #         username=logged_in_info.registration_number,
-    #         semSubID=sem_sub_id,
-    #         csrf_token=logged_in_info.post_login_csrf_token
-    #     )
-
     # async def get_marks(self, some_identifier: str) -> dict:
     #    logged_in_info = await self._ensure_logged_in()
     #    return await fetch_marks_data(

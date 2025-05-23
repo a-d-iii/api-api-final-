@@ -3,5 +3,6 @@ bs4
 lxml
 Pillow
 numpy
+pandas
 python-dotenv
 pydantic
