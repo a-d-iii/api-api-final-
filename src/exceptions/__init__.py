@@ -4,5 +4,7 @@ from .exception import (
     VtopCaptchaError,
     VtopCsrfError,
     VtopLoginError,
+    VtopAttendanceError,
+    VtopBiometricError,
     VtopSessionError,
 )

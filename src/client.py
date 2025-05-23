@@ -6,22 +6,25 @@ from .login import (
     fetch_csrf_token,
     pre_login,
     fetch_captcha,
-    student_login
+    student_login,
+    LoggedInStudent
 )
-from .login.model import LoggedInStudent
-from .utils.solve_captcha import solve_captcha 
+
+from .utils import solve_captcha
 
 from .attendance import AttendanceModel,fetch_attendance
 from .attendance.model.attendance_model import AttendanceModel
 
 from .biometric import fetch_biometric, BiometricModel
 
-from .exceptions.exception import (
+from .exceptions import (
     VtopLoginError,
     VtopCaptchaError,
     VtopConnectionError,
     VtopSessionError,
-    VitapVtopClientError
+    VitapVtopClientError,
+    VtopAttendanceError,
+    VtopBiometricError,
 )
 
 
