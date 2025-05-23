@@ -64,7 +64,7 @@ async def fetch_biometric(
         biometric_response.raise_for_status() # Raise exception for bad status codes
 
         # Parse the HTML content
-        parsed_data = biometric_parser.biometric_parser(biometric_response.text)
+        parsed_data = biometric_parser.parse_biometric(biometric_response.text)
 
         return parsed_data
     

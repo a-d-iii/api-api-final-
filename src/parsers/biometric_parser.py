@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from src.biometric.model.biometric_model import BiometricModel
 from src.exceptions.exception import VtopParsingError
 
-def biometric_parser(html: str) -> list[BiometricModel]:
+def parse_biometric(html: str) -> list[BiometricModel]:
     """
     Parses the HTML content of the VIT biometric logs table and extracts each log
     into a list of dictionaries with time and location details.

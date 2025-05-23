@@ -9,4 +9,7 @@ from .exception import (
     VtopAttendanceError,
     VtopBiometricError,
     VtopTimetableError,
+    VtopMentorError,
+    VtopGradeHistoryError,
+    VtopProfileError
 )

@@ -1,7 +1,10 @@
 from bs4 import BeautifulSoup
 
+from src.exceptions import VtopParsingError
+from src.grade_history.model import GradeHistoryModel
 
-def parse_grade_history(html : str) -> dict[str, str]:
+
+def parse_grade_history(html : str) -> GradeHistoryModel:
     try: 
         soup = BeautifulSoup(html, 'html.parser')
         table = soup.find('table', {'class': 'table table-hover table-bordered'})
@@ -15,11 +18,8 @@ def parse_grade_history(html : str) -> dict[str, str]:
             'cgpa': columns[2].get_text(strip=True)
         }
 
-        return grades
+        return GradeHistoryModel(**grades)
+
     except Exception as e:
         print(f"Error parsing grade history: {str(e)}")
-        return {
-            'credits_registered': "N/A",
-            'credits_earned': "N/A",
-            'cgpa': "N/A"
-        }
+        raise VtopParsingError(f"An error occured while parsing grade history: {e}")

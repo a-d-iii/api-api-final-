@@ -1,1 +1,0 @@
-from .attendance_parser import parse_attendance

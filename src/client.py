@@ -2,6 +2,8 @@ import string
 import httpx
 import asyncio
 
+
+
 from .constants import VTOP_BASE_URL
 
 from .exceptions import (
@@ -29,8 +31,9 @@ from .utils import solve_captcha
 from .attendance import fetch_attendance, AttendanceModel
 from .biometric import fetch_biometric, BiometricModel
 from .timetable import fetch_timetable, TimetableModel
-
-
+from .grade_history import fetch_grade_history, GradeHistoryModel
+from .mentor import fetch_mentor_info, MentorModel
+from .profile import fetch_profile, StudentProfileModel
 
 
 
@@ -183,6 +186,51 @@ class VtopClient:
             client=self._client,
             username=logged_in_info.registration_number,
             semSubID=sem_sub_id,
+            csrf_token=logged_in_info.post_login_csrf_token
+        )
+    
+
+    async def get_grade_history(self) -> GradeHistoryModel:
+        """
+        Fetches grade history for the given registration_number.
+
+        Returns:
+            A GradeHistoryModel containing the parsed grade history details.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_grade_history(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            csrf_token=logged_in_info.post_login_csrf_token
+        )
+    
+
+    async def get_mentor(self) -> MentorModel:
+        """
+        Fetches mentor data for the given registration_number.
+
+        Returns:
+            A MentorModel containing the parsed mentor data.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_mentor_info(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            csrf_token=logged_in_info.post_login_csrf_token
+        )
+    
+    
+    async def get_profile(self) -> StudentProfileModel:
+        """
+        Fetches profile data for the given registration_number.
+
+        Returns:
+            A StudentProfileModel containing the parsed student details.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_profile(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
             csrf_token=logged_in_info.post_login_csrf_token
         )
 

@@ -26,7 +26,7 @@ async def fetch_timetable(
 
     Raises:
         VtopConnectionError: If an HTTP request fails.
-        VtopAttendanceError: If initialization or data fetch fails.
+        VtopTimetableError: If initialization or data fetch fails.
         VtopParsingError: If parsing fails.
     """
     try:

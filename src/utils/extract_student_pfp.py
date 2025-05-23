@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 
-def extract_pfp_base64(html : str) -> str:
+def extract_pfp_base64(html : str):
     """
     Finds and returns the base64 code of the users profile photo from HTML content.
 
