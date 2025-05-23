@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "vitap-vtop-client"
+version = "0.1.0"
+description = "A Pythonic interface to interact with the VIT-AP VTOP student portal."
+authors = ["Udhay Adithya <your_email@example.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/Udhay-Adithya/vitap-vtop-client"
+repository = "https://github.com/Udhay-Adithya/vitap-vtop-client"
+keywords = ["VIT-AP", "VTOP", "student portal", "API", "Python"]
+packages = [{ include = "vitap_vtop_client" }]
+
+[tool.poetry.dependencies]
+python = "^3.13.3"
+httpx = "^0.28.1"
+pydantic = "^2.11.5"
+bs4 = "0.0.2"
+lxml = "5.4.0"
+Pillow = "11.2.1"
+numpy = "2.2.6"
+pandas = "2.2.3"
+python-dotenv = "1.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
