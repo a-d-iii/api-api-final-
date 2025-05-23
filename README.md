@@ -1,11 +1,12 @@
 <br />
-<div style="text-align: center;">
+<p align="center">
     <img src="public/Final_Icon_512x512.png" width="100" height="100" style="margin-right: 60px;"> 
     <img src="public/vitaplogo.png" width="322" height="100"> 
-</div>
+</p>
 <br>
 <br>
-<div style="text-align: center;">
+
+<p align="center">
     <a href="https://github.com/Udhay-Adithya/vitap-vtop-client">
     <img src="https://img.shields.io/github/stars/Udhay-Adithya/vitap-vtop-client?style=social" alt="License: MIT">
     </a>
@@ -16,7 +17,7 @@
     <a href="https://github.com/Udhay-Adithya/vitap-vtop-client/issues">
     <img src="https://img.shields.io/github/issues/Udhay-Adithya/vitap-vtop-client" alt="License: MIT">
     </a>
-</div>
+</p>
 <br>
 
 `vitap-vtop-client` is a Python library providing a programmatic interface for interacting with the VIT-AP VTOP student portal. It simplifies web scraping, session management, CAPTCHA handling, and HTML parsing, offering structured access to student information.
