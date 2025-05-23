@@ -55,7 +55,7 @@ For more detailed setup information, please see [CONTRIBUTING.md](CONTRIBUTING.m
 The primary interface to the library is the `VtopClient` class. You need to initialize it with your VTOP registration number and password.
 
 ```python
-from src.client import VtopClient
+from vitap_vtop_client.client import VtopClient
 
 async def main():
     client = VtopClient("your_registration_number", "your_password")
@@ -73,8 +73,8 @@ The client is designed to be used with an `async with` statement, which handles 
 
 ```python
 import asyncio
-from src.client import VtopClient
-from src.exceptions import VitapVtopClientError, VtopLoginError
+from vitap_vtop_client.client import VtopClient
+from vitap_vtop_client.exceptions import VitapVtopClientError, VtopLoginError
 
 async def main():
     async with VtopClient("your_registration_number", "your_password") as client:
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 The main class for interacting with VTOP.
 
 ```python
-from src.client import VtopClient
+from vitap_vtop_client.client import VtopClient
 Constructor
 VtopClient(username: str, password: str, max_login_retries: int = 3, captcha_retries: int = 5)
 ```
@@ -262,7 +262,7 @@ The library defines custom exceptions to handle various error scenarios. All cus
 Always wrap API calls in `try...except` blocks to handle these potential errors gracefully.
 
 ```python
-from src.exceptions import VitapVtopClientError, VtopLoginError, VtopParsingError
+from vitap_vtop_client.exceptions import VitapVtopClientError, VtopLoginError, VtopParsingError
 
 try:
     # API call

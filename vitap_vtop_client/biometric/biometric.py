@@ -1,11 +1,11 @@
 import httpx
 from .model.biometric_model import BiometricModel
-from src.constants import HEADERS, BIOMETRIC_LOG_URL, GET_BIOMETRIC_LOG_URL
+from vitap_vtop_client.constants import HEADERS, BIOMETRIC_LOG_URL, GET_BIOMETRIC_LOG_URL
 import time
 from datetime import datetime, timezone
 
-from src.exceptions.exception import VtopBiometricError, VtopConnectionError, VtopParsingError
-from src.parsers import biometric_parser
+from vitap_vtop_client.exceptions.exception import VtopBiometricError, VtopConnectionError, VtopParsingError
+from vitap_vtop_client.parsers import biometric_parser
 
 async def fetch_biometric(
         client: httpx.AsyncClient,

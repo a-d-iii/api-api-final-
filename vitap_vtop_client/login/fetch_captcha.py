@@ -1,9 +1,9 @@
 import httpx
 import asyncio
 
-from src.constants import VTOP_LOGIN_URL, HEADERS
-from src.utils import find_captcha
-from src.exceptions import VtopConnectionError, VtopCaptchaError
+from vitap_vtop_client.constants import VTOP_LOGIN_URL, HEADERS
+from vitap_vtop_client.utils import find_captcha
+from vitap_vtop_client.exceptions import VtopConnectionError, VtopCaptchaError
 
 
 async def fetch_captcha(client: httpx.AsyncClient, retries: int) -> str:

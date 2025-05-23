@@ -1,12 +1,12 @@
 import httpx
 import time
-from src.constants import PROFILE_URL, HEADERS
-from src.mentor import fetch_mentor_info
-from src.grade_history import fetch_grade_history
-from src.parsers.profile_parser import parse_student_profile
+from vitap_vtop_client.constants import PROFILE_URL, HEADERS
+from vitap_vtop_client.mentor import fetch_mentor_info
+from vitap_vtop_client.grade_history import fetch_grade_history
+from vitap_vtop_client.parsers.profile_parser import parse_student_profile
 from .model import StudentProfileModel
 
-from src.exceptions import VtopConnectionError, VtopProfileError, VtopParsingError
+from vitap_vtop_client.exceptions import VtopConnectionError, VtopProfileError, VtopParsingError
 
 async def fetch_profile(
     client: httpx.AsyncClient,

@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
-from src.exceptions import VtopParsingError
-from src.grade_history.model import GradeHistoryModel
+from vitap_vtop_client.exceptions import VtopParsingError
+from vitap_vtop_client.grade_history.model import GradeHistoryModel
 
 
 def parse_grade_history(html : str) -> GradeHistoryModel:

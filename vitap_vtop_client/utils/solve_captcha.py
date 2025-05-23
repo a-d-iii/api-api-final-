@@ -5,10 +5,10 @@ import numpy as np
 from PIL import Image
 import importlib.resources
 
-from src.exceptions.exception import VtopCaptchaError
+from vitap_vtop_client.exceptions.exception import VtopCaptchaError
 
 try:
-    weights_data_str = importlib.resources.read_text('src.resources', 'weights.json')
+    weights_data_str = importlib.resources.read_text('vitap_vtop_client.resources', 'weights.json')
     model_config = json.loads(weights_data_str)
     weights = np.array(model_config.get("weights"))
     biases = np.array(model_config.get("biases"))

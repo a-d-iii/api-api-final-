@@ -1,10 +1,10 @@
 import httpx
 import time
 from datetime import datetime, timezone
-from src.constants import TIME_TABLE_URL, GET_TIME_TABLE_URL, HEADERS
-from src.parsers import timetable_parser
-from src.exceptions.exception import VtopConnectionError, VtopTimetableError, VtopParsingError
-from src.timetable.model.timetable_model import TimetableModel
+from vitap_vtop_client.constants import TIME_TABLE_URL, GET_TIME_TABLE_URL, HEADERS
+from vitap_vtop_client.parsers import timetable_parser
+from vitap_vtop_client.exceptions.exception import VtopConnectionError, VtopTimetableError, VtopParsingError
+from vitap_vtop_client.timetable.model.timetable_model import TimetableModel
 
 async def fetch_timetable(
     client: httpx.AsyncClient,

@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional
 
-from src.grade_history import GradeHistoryModel
-from src.mentor import MentorModel
+from vitap_vtop_client.grade_history import GradeHistoryModel
+from vitap_vtop_client.mentor import MentorModel
 
 
 class StudentProfileModel(BaseModel):

@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
-from src.exceptions import VtopParsingError
-from src.timetable.model import TimetableModel
+from vitap_vtop_client.exceptions import VtopParsingError
+from vitap_vtop_client.timetable.model import TimetableModel
 
 # TODO: Use pandas to parse the timetable
 # Current implementation is very sensitive to changes

@@ -1,10 +1,10 @@
 import httpx
 import time
 from datetime import datetime, timezone
-from src.attendance.model.attendance_model import AttendanceModel
-from src.exceptions.exception import VtopAttendanceError, VtopConnectionError, VtopParsingError
-from src.parsers import attendance_parser
-from src.constants import VIEW_ATTENDANCE_URL, ATTENDANCE_URL, HEADERS
+from vitap_vtop_client.attendance.model.attendance_model import AttendanceModel
+from vitap_vtop_client.exceptions.exception import VtopAttendanceError, VtopConnectionError, VtopParsingError
+from vitap_vtop_client.parsers import attendance_parser
+from vitap_vtop_client.constants import VIEW_ATTENDANCE_URL, ATTENDANCE_URL, HEADERS
 
 async def fetch_attendance(
     client: httpx.AsyncClient,

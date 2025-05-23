@@ -1,7 +1,7 @@
 import httpx
-from src.constants import VTOP_URL, HEADERS 
-from src.exceptions.exception import VtopConnectionError, VtopCsrfError
-from src.utils import find_csrf
+from vitap_vtop_client.constants import VTOP_URL, HEADERS 
+from vitap_vtop_client.exceptions.exception import VtopConnectionError, VtopCsrfError
+from vitap_vtop_client.utils import find_csrf
 import asyncio
 
 async def fetch_csrf_token(client: httpx.AsyncClient, max_retries: int = 3) -> str:

@@ -1,9 +1,9 @@
 import httpx
 import time
-from src.constants import HEADERS, GRADE_HISTORY_URL
+from vitap_vtop_client.constants import HEADERS, GRADE_HISTORY_URL
 from .model import GradeHistoryModel
-from src.parsers import grade_history_parser
-from src.exceptions import VtopConnectionError, VtopGradeHistoryError, VtopParsingError
+from vitap_vtop_client.parsers import grade_history_parser
+from vitap_vtop_client.exceptions import VtopConnectionError, VtopGradeHistoryError, VtopParsingError
 
 async def fetch_grade_history(
     client: httpx.AsyncClient,

@@ -1,9 +1,9 @@
 import httpx
 import time
-from src.constants import HEADERS, MENTOR_DETAILS_URL
+from vitap_vtop_client.constants import HEADERS, MENTOR_DETAILS_URL
 from .model import MentorModel
-from src.parsers.mentor_parser import parse_mentor_details
-from src.exceptions import VtopConnectionError, VtopMentorError, VtopParsingError
+from vitap_vtop_client.parsers.mentor_parser import parse_mentor_details
+from vitap_vtop_client.exceptions import VtopConnectionError, VtopMentorError, VtopParsingError
 
 async def fetch_mentor_info(
     client: httpx.AsyncClient,

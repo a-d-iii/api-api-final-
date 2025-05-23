@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
-from src.attendance.model.attendance_model import AttendanceModel
-from src.exceptions.exception import VtopParsingError
+from vitap_vtop_client.attendance.model.attendance_model import AttendanceModel
+from vitap_vtop_client.exceptions.exception import VtopParsingError
 
 def parse_attendance(html: str) -> list[AttendanceModel]:
     """

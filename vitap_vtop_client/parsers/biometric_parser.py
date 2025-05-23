@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
-from src.biometric.model.biometric_model import BiometricModel
-from src.exceptions.exception import VtopParsingError
+from vitap_vtop_client.biometric.model.biometric_model import BiometricModel
+from vitap_vtop_client.exceptions.exception import VtopParsingError
 
 def parse_biometric(html: str) -> list[BiometricModel]:
     """

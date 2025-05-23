@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
-from src.exceptions.exception import VtopParsingError
-from src.mentor.model import MentorModel
+from vitap_vtop_client.exceptions.exception import VtopParsingError
+from vitap_vtop_client.mentor.model import MentorModel
 
 def parse_mentor_details(html) -> MentorModel:
     soup = BeautifulSoup(html, "html.parser")

@@ -1,6 +1,6 @@
 import httpx
-from src.constants import HEADERS, VTOP_PRELOGIN_URL
-from src.exceptions.exception import VtopConnectionError 
+from vitap_vtop_client.constants import HEADERS, VTOP_PRELOGIN_URL
+from vitap_vtop_client.exceptions.exception import VtopConnectionError 
 
 async def pre_login(client: httpx.AsyncClient, csrf_token: str):
     """

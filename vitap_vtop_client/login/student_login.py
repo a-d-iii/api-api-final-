@@ -1,9 +1,9 @@
 import httpx
-from src.constants import VTOP_BASE_URL, VTOP_LOGIN_ERROR_URL, VTOP_LOGIN_URL, VTOP_CONTENT_URL, HEADERS
-from src.exceptions.exception import VtopConnectionError, VtopLoginError
-from src.login.model.logged_in_student_model import LoggedInStudent
-from src.utils import find_login_response
-from src.utils import find_csrf 
+from vitap_vtop_client.constants import VTOP_BASE_URL, VTOP_LOGIN_ERROR_URL, VTOP_LOGIN_URL, VTOP_CONTENT_URL, HEADERS
+from vitap_vtop_client.exceptions.exception import VtopConnectionError, VtopLoginError
+from vitap_vtop_client.login.model.logged_in_student_model import LoggedInStudent
+from vitap_vtop_client.utils import find_login_response
+from vitap_vtop_client.utils import find_csrf 
 
 # TODO: Implement retry mechanism for Captch Failures
 async def student_login(
