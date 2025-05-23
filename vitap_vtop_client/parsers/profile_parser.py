@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
-from src.exceptions.exception import VtopParsingError
-from src.profile.model import StudentProfileModel
-from src.utils import extract_pfp_base64
+from vitap_vtop_client.exceptions import VtopParsingError
+from vitap_vtop_client.profile.model import StudentProfileModel
+from vitap_vtop_client.utils import extract_pfp_base64
 
 def parse_student_profile(html: str) -> StudentProfileModel :
     """
