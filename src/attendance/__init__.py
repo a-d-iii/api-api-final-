@@ -1,1 +1,2 @@
-from .attendance import get_attendance
+from .attendance import fetch_attendance
+from .model.attendance_model import AttendanceModel

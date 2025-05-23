@@ -2,7 +2,19 @@ import string
 import httpx
 import asyncio
 
-from src.attendance.model.attendance_model import AttendanceModel
+from .login import (
+    fetch_csrf_token,
+    pre_login,
+    fetch_captcha,
+    student_login
+)
+from .login.model import LoggedInStudent
+from .utils.solve_captcha import solve_captcha 
+
+from .attendance import AttendanceModel,fetch_attendance
+from .attendance.model.attendance_model import AttendanceModel
+
+from .biometric import fetch_biometric, BiometricModel
 
 from .exceptions.exception import (
     VtopLoginError,
@@ -11,20 +23,8 @@ from .exceptions.exception import (
     VtopSessionError,
     VitapVtopClientError
 )
-from .login import (
-    fetch_csrf_token,
-    pre_login,
-    fetch_captcha,
-    student_login
-)
-from .login.model import LoggedInStudent # Ensure this import path is correct
-from .utils.solve_captcha import solve_captcha # Assuming this utility exists
 
-# Import your specific data fetching functions
-from .attendance.attendance import get_attendance as fetch_attendance_data
-# from .timetable.timetable import get_timetable as fetch_timetable_data # Example
-# from .marks.marks import get_marks as fetch_marks_data # Example
-# ... and so on for other features
+
 
 class VtopClient:
     """
@@ -134,10 +134,28 @@ class VtopClient:
             A list containing the parsed attendance data(AttendanceModel).
         """
         logged_in_info = await self._ensure_logged_in()
-        return await fetch_attendance_data(
+        return await fetch_attendance(
             client=self._client,
-            username=logged_in_info.registration_number,
+            registration_number=logged_in_info.registration_number,
             semSubID=sem_sub_id,
+            csrf_token=logged_in_info.post_login_csrf_token
+        )
+    
+    async def get_biometric(self, date: str) -> list[BiometricModel]:
+        """
+        Fetches biometric data for the given date.
+
+        Args:
+            date: The date for which the biometric log is requested, in 'dd-mm-yyyy' format.
+
+        Returns:
+            A list containing the parsed biometric data(AttendanceModel).
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_biometric(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            date=date,
             csrf_token=logged_in_info.post_login_csrf_token
         )
 

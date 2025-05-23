@@ -26,6 +26,12 @@ class VtopAttendanceError(VitapVtopClientError):
     """Raised when fetching attendance fails due to attendance parsing, invalid semSubId, server-side validation, etc."""
     def __init__(self, message: str, status_code: int | None = None):
         super().__init__(message, status_code)
+
+class VtopBiometricError(VitapVtopClientError):
+    """Raised when fetching biometric fails due to data parsing, invalid date, server-side validation, etc."""
+    def __init__(self, message: str, status_code: int | None = None):
+        super().__init__(message, status_code)
+
 class VtopCaptchaError(VtopLoginError):
     """Raised for errors specifically related to CAPTCHA fetching or solving."""
     def __init__(self, message: str, status_code: int | None = None):

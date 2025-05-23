@@ -6,9 +6,9 @@ from src.exceptions.exception import VtopAttendanceError, VtopConnectionError, V
 from src.parsers import attendance_parser
 from src.constants import VIEW_ATTENDANCE_URL, ATTENDANCE_URL, HEADERS
 
-async def get_attendance(
+async def fetch_attendance(
     client: httpx.AsyncClient,
-    username: str,
+    registration_number: str,
     semSubID: str,
     csrf_token: str
 ) -> list[AttendanceModel]:
@@ -17,7 +17,7 @@ async def get_attendance(
 
     Parameters:
         client (httpx.AsyncClient): The active httpx async client.
-        username (str): The username of the student.
+        registration_number (str): The registration_number of the student.
         semSubID (str): The identifier for the semester subject.
         csrf_token (str): The CSRF token.
 
@@ -33,7 +33,7 @@ async def get_attendance(
         # First POST to verify menu/session
         data_initial = {
             "verifyMenu": "true",
-            "authorizedID": username,
+            "authorizedID": registration_number,
             "_csrf": csrf_token,
             "nocache": int(round(time.time() * 1000)),
         }
@@ -62,7 +62,7 @@ async def get_attendance(
         data_fetch = {
             "_csrf": csrf_token,
             "semesterSubId": semSubID,
-            "authorizedID": username,
+            "authorizedID": registration_number,
             "x": datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT"),
         }
         attendance_response = await client.post(VIEW_ATTENDANCE_URL, data=data_fetch, headers=HEADERS)
