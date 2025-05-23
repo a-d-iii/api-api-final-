@@ -5,7 +5,7 @@ from src.login.model.logged_in_student_model import LoggedInStudent
 from src.utils import find_login_response
 from src.utils import find_csrf 
 
-
+# TODO: Implement retry mechanism for Captch Failures
 async def student_login(
     client: httpx.AsyncClient,
     csrf_token: str,
@@ -45,7 +45,6 @@ async def student_login(
         print(response.cookies)
 
         if (response.url == VTOP_CONTENT_URL):
-            print(response.headers.get("Location"))
             print(f"Login successful for user {registration_number}. Redirected to content page.")
             # After successful login, we need to get the new CSRF token from the content page
             # for subsequent requests.
@@ -76,4 +75,4 @@ async def student_login(
     
     except Exception as e:
         print(f"An unexpected error occurred during login process: {e}")
-        raise VtopConnectionError(f"An unexpected error occurred during login: {e}") from e
+        raise VtopLoginError(f"An unexpected error occurred during login: {e}") from e

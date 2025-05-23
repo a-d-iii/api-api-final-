@@ -2,6 +2,8 @@ import string
 import httpx
 import asyncio
 
+from src.attendance.model.attendance_model import AttendanceModel
+
 from .exceptions.exception import (
     VtopLoginError,
     VtopCaptchaError,
@@ -40,7 +42,7 @@ class VtopClient:
         """
         if not username or not password:
             raise VtopLoginError("Username and password are required for VtopClient.", status_code=400)
-        # TODO: Basic validation, expand this
+        # TODO: Basic validation, improve this
         if len(username) < 5 or any(c in string.punctuation for c in username):
             raise VtopLoginError("Invalid username format for VtopClient.", status_code=400)
 
@@ -55,7 +57,7 @@ class VtopClient:
     async def _perform_login_sequence(self) -> LoggedInStudent:
         """
         Handles the complete login sequence.
-        This internal method encapsulates the logic previously in the global login function.
+        This sequence must be performed everytime when a user needs something. 
         """
         for attempt in range(self.max_login_retries):
             print(f"VtopClient: Login attempt {attempt + 1}/{self.max_login_retries} for user {self.username}")
@@ -108,7 +110,6 @@ class VtopClient:
         This method is idempotent.
         """
         # Check if already logged in and session is potentially valid
-        # A more sophisticated check might involve a quick, authenticated ping to VTOP
         if self._logged_in_student is not None:
             return self._logged_in_student
 
@@ -122,7 +123,7 @@ class VtopClient:
                 raise VitapVtopClientError("VtopClient: Failed to establish a login session.")
             return self._logged_in_student
 
-    async def get_attendance(self, sem_sub_id: str) -> dict:
+    async def get_attendance(self, sem_sub_id: str) -> list[AttendanceModel]:
         """
         Fetches attendance data for the given semester subject ID.
 
@@ -130,7 +131,7 @@ class VtopClient:
             sem_sub_id: The semester subject ID (e.g., "AP2023242").
 
         Returns:
-            A dictionary containing the parsed attendance data.
+            A list containing the parsed attendance data(AttendanceModel).
         """
         logged_in_info = await self._ensure_logged_in()
         return await fetch_attendance_data(

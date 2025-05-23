@@ -1,6 +1,8 @@
 import httpx
 import time
 from datetime import datetime, timezone
+from src.attendance.model.attendance_model import AttendanceModel
+from src.exceptions.exception import VtopAttendanceError, VtopConnectionError, VtopParsingError
 from src.parsers import attendance_parser
 from src.constants import VIEW_ATTENDANCE_URL, ATTENDANCE_URL, HEADERS
 
@@ -9,7 +11,7 @@ async def get_attendance(
     username: str,
     semSubID: str,
     csrf_token: str
-) -> dict:
+) -> list[AttendanceModel]:
     """
     Retrieves the attendance details for a specific user and semester subject.
 
@@ -20,12 +22,12 @@ async def get_attendance(
         csrf_token (str): The CSRF token.
 
     Returns:
-        dict: A dictionary containing the parsed attendance data.
+        list[AttendanceModel]: A list containing the parsed attendance data.
 
     Raises:
-        httpx.RequestError: If an HTTP request fails.
-        ValueError: If the initial POST or the attendance data request fails or returns unexpected content.
-        Exception: For parsing errors.
+        VtopConnectionError: If an HTTP request fails.
+        VtopAttendanceError: If the initial POST or the attendance data request fails or returns unexpected content.
+        VtopParsingError: For parsing errors.
     """
     try:
         # First POST to verify menu/session
@@ -43,13 +45,17 @@ async def get_attendance(
         # This might involve checking the response content or status,
         # but raise_for_status is a good start for HTTP errors.
         # More specific checks might be needed based on VTOP's responses.
-
+    
     except httpx.RequestError as e:
         print(f"Attendance initial POST failed: {e}")
-        raise ValueError(f"Failed to initialize attendance page: {e}") from e
+        raise VtopConnectionError(
+                f"Failed to initialize attendance page: {e}",
+                original_exception=e,
+                status_code=502
+            )
     except Exception as e:
          print(f"An unexpected error occurred during attendance initial POST: {e}")
-         raise ValueError(f"Failed to initialize attendance page: {e}") from e
+         raise VtopAttendanceError(f"Failed to initialize attendance page: {e}") from e
 
     try:
         # Second POST to fetch attendance data
@@ -59,32 +65,24 @@ async def get_attendance(
             "authorizedID": username,
             "x": datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT"),
         }
-        # Use await client.post
         attendance_response = await client.post(VIEW_ATTENDANCE_URL, data=data_fetch, headers=HEADERS)
         attendance_response.raise_for_status() # Raise exception for bad status codes
-
-        # Check response content for VTOP-specific errors before parsing
-        # Example: check if the response contains a known error message div/span
-        if "Invalid semester subject ID" in attendance_response.text: # Example error check
-             raise ValueError(f"Invalid semester subject ID: {semSubID}")
-        # Add other specific VTOP error checks here
 
         # Parse the HTML content
         parsed_data = attendance_parser.parse_attendance(attendance_response.text)
 
-        # Check if parser returned an error (if parser handles errors by returning dict with "error")
-        if isinstance(parsed_data, dict) and "error" in parsed_data:
-             # If parser returns error dict, raise an exception
-             raise ValueError(f"Failed to parse attendance data: {parsed_data['error']}")
-
         return parsed_data
+    
+    except VtopParsingError as e:
+        raise e
 
     except httpx.RequestError as e:
         print(f"Attendance data fetch failed: {e}")
-        raise ValueError(f"Failed to fetch attendance data: {e}") from e
-    except ValueError as e:
-         # Re-raise ValueErrors from content checks or parser errors
-         raise e
+        raise VtopConnectionError(
+                f"Failed to fetch attendance data: {e}",
+                original_exception=e,
+                status_code=502
+            )
     except Exception as e:
         print(f"An unexpected error occurred while fetching or parsing attendance: {e}")
-        raise Exception(f"An unexpected error occurred: {e}") from e # Wrap unexpected errors
+        raise VtopAttendanceError(f"An unexpected error occurred while fetching attendance for semester ${semSubID}: {e}") from e
