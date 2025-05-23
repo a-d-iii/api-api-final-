@@ -43,7 +43,7 @@ Pull Requests (PRs) are the primary way to contribute code to this project.
 
 
 ```bash
-git clone https://github.com/Udhay-Adithya/vitap-vtop-client.git
+git clone https://github.com/your-name/vitap-vtop-client.git
 ```
 
 
@@ -73,20 +73,47 @@ Project maintainers will review your PR and may request changes. Please be respo
 ## Development Setup
 To set up the project for local development:
 
-1.  **Clone the repository** (if you haven't already forked and cloned):
+1. **Clone the repository** (if you haven't already forked and cloned):
     ```bash
-    git clone https://github.com/Udhay-Adithya/vitap-vtop-client.git
-    cd vit_ap_vtop_api
+    git clone https://github.com/your-name/vitap-vtop-client.git
+    cd vitap-vtop-client  # Fixed directory name to match repository
     ```
-2.  **Create a virtual environment** (recommended):
+
+2. **Set up Python virtual environment** (optional):
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
     ```
-3.  **Install dependencies**:
+
+3. **Install Poetry** (if not already installed):
+
+    This project uses Poetry for dependency management and packaging.
+
     ```bash
-    pip install -r requirements.txt
+    # Install Poetry using the official installer
+    # For Linux, macOS, Windows (WSL)
+    curl -sSL https://install.python-poetry.org | python3 -
+
+    # For Windows(Powershell)
+    (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+    
+    # Verify installation
+    poetry --version
+    
+    # Configure Poetry to create virtual environments in the project directory(optional)
+    poetry config virtualenvs.in-project true
     ```
+
+For other ways of installation visit : [Poetry Documentation](https://python-poetry.org/docs/#installing-with-the-official-installer)
+
+4. **Install dependencies**:
+    ```bash
+    poetry install
+    ```
+
+**Important Notes:**
+- The `poetry config virtualenvs.in-project true` ensures Poetry creates its virtual environment in the project directory (under `.venv/`), keeping everything self-contained.
+- If you want to use the virtual environment you created manually (step 2), run `poetry install` after activating it.
     
 ## Coding Guidelines
 

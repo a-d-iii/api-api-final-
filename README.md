@@ -1,56 +1,74 @@
-# vitap-vtop-client - Python Client for VIT-AP VTOP Portal
+<br />
+<div style="text-align: center;">
+    <img src="public/Final_Icon_512x512.png" width="100" height="100" style="margin-right: 60px;"> 
+    <img src="public/vitaplogo.png" width="322" height="100"> 
+</div>
+<br>
+<br>
+<div style="text-align: center;">
+    <a href="https://github.com/Udhay-Adithya/vitap-vtop-client">
+    <img src="https://img.shields.io/github/stars/Udhay-Adithya/vitap-vtop-client?style=social" alt="License: MIT">
+    </a>
+    <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
+    </a>
+    <img src="https://img.shields.io/badge/Version-0.1.0-blue.svg" alt="Version 0.1.0">
+    <a href="https://github.com/Udhay-Adithya/vitap-vtop-client/issues">
+    <img src="https://img.shields.io/github/issues/Udhay-Adithya/vitap-vtop-client" alt="License: MIT">
+    </a>
+</div>
+<br>
 
-`vitap-vtop-client` is a Python library that provides a programmatic interface for interacting with the VIT-AP VTOP student portal. It abstracts away the complexities of web scraping, session management, CAPTCHA handling, and parsing HTML responses, offering structured data access to various student information sections.
+`vitap-vtop-client` is a Python library providing a programmatic interface for interacting with the VIT-AP VTOP student portal. It simplifies web scraping, session management, CAPTCHA handling, and HTML parsing, offering structured access to student information.
 
-## Table of Contents
-1. [Overview](#overview)
-2. [Features](#features)
-3. [Installation](#installation)
-4. [Endpoints](#endpoints)
-5. [Example Usage](#example-usage)
-6. [Contributing](#contributing)
-7. [License](#license)
-8. [Future Updates](#future-updates)
-9. [Companion App](#companion-app)
-
-## Overview
-`vitap-vtop-client` is a Python library that provides a programmatic interface for interacting with the VIT-AP VTOP student portal. It abstracts away the complexities of web scraping, session management, CAPTCHA handling, and parsing HTML responses, offering structured data access to various student information sections.
-
-This library is designed to serve as a backend component for applications that need to retrieve data from the VTOP portal, such as mobile apps, web services, or analytical tools.
+This library is designed as a backend component for applications needing VTOP data, such as mobile apps, web services, or analytical tools.
 
 **Disclaimer:** Use this library responsibly and in accordance with VIT-AP's terms of service. Web scraping is subject to changes in the target website's structure, which may occasionally affect the library's functionality.
 
+## Table of Contents
+1. [Features](#features)
+2. [Installation](#installation)
+3. [Quick Start](#quick-start)
+4. [Documentation](#documentation)
+5. [Contributing](#contributing)
+6. [License](#license)
+7. [Related Project: VTOP API](#related-project-vtop-api)
+
 ## Features
--   User authentication and session management.
--   Retrieving student profile information.
--   Accessing academic details like attendance, timetable, marks, and exam schedules.
--   Fetching biometric log entries.
--   Viewing mentor, HOD, and Dean details.
--   Checking financial information, including pending payments and receipts.
--   Posting and reviewing hostel outing requests (weekend and general).
--   Retrieving NCGPA and rank details.
+*   **User Authentication:** Secure login and session management.
+*   **Profile Information:** Retrieve comprehensive student profile details.
+*   **Academic Data:** Access attendance records, timetables, marks, and exam schedules.
+*   **Biometric Logs:** Fetch student biometric entry/exit logs.
+*   **Contact Details:** View mentor, HOD, and Dean information.
+*   **Financial Information:** Check pending payments and download receipts.
+*   **Hostel Outing Requests:** Post and review weekend and general outing requests.
+*   **Academic Performance:** Retrieve NCGPA and rank details.
 
 ## Installation
-To use the API, clone the repository and install the required dependencies.
+
+If you want to use `vitap-vtop-client` in your project, you can install it directly from GitHub.
+
+**Using `pip` (recommended for adding to `requirements.txt`):**
 
 ```bash
-git clone https://github.com/Udhay-Adithya/vitap-vtop-client.git
-
-cd vitap-vtop-client
-
-pip install -r requirements.txt
+pip install git+https://github.com/Udhay-Adithya/vitap-vtop-client.git@main
 ```
 
-For a detailed setup information see [CONTRIBUTING.md](/CONTRIBUTING.md)
+**Using `poetry`:**
 
+```bash
+poetry add git+https://github.com/Udhay-Adithya/vitap-vtop-client.git@main
+```
 
-## Endpoints
+## Quick Start
 
-Refer to the main documentation [`DOCS.md`](/DOCS.md) for all available usage options.
+Here's a basic example of how to log in and fetch attendance data:
 
-## Example Usage
-### Login and Fetch Attendance
 ```python
+import asyncio
+from vitap_vtop_client.client import VtopClient
+from vitap_vtop_client.exceptions import VitapVtopClientError, VtopLoginError
+
 async def main():
     async with VtopClient("your_registration_number", "your_password") as client:
         try:
@@ -69,17 +87,23 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+## Documentation
+
+For comprehensive information on all available methods, data models, and advanced usage, please refer to the main documentation:
+
+➡️ **[`DOCS.md`](DOCS.md)**
+
 ## Contributing
-Contributions are welcome! Please see [CONTRIBUTING.md](/CONTRIBUTING.md) for guidelines.
+Contributions are welcome! We appreciate any help, from bug reports and fixes to feature suggestions and documentation improvements.
+
+Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute, set up your development environment, and submit pull requests.
 
 ## License
-This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
-## Future Updates
-We are committed to improving this library. Future updates will include new features, bug fixes, and performance improvements.
+## Related Project: VTOP API
+For those looking for a ready-to-use API service built on top of this library, check out the **VITAP-VTOP API**:
 
-## VTOP-API
-I have also developed a light-weight FastAPI Wrapper for this library. The VITAP-VTOP API Lets everyone to access and retreive data from VTOP at ease. You can find the app repository [here](https://github.com/Udhay-Adithya/vit_ap_vtop_api/).
+➡️ **[VITAP-VTOP API Repository](https://github.com/Udhay-Adithya/vit_ap_vtop_api/)**
 
-We encourage users to try out the API and provide feedback. Future updates will enhance both the library and the API to better serve the needs of VIT-AP students.
-
+This FastAPI wrapper allows easy access to VTOP data without needing to integrate the client library directly. We encourage users to try out the API and provide feedback.
