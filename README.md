@@ -13,7 +13,7 @@
     <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
     </a>
-    <img src="https://img.shields.io/badge/Version-0.1.0-blue.svg" alt="Version 0.1.0">
+    <img src="https://img.shields.io/badge/Version-0.2.0-blue.svg" alt="Version 0.2.0">
     <a href="https://github.com/Udhay-Adithya/vitap-vtop-client/issues">
     <img src="https://img.shields.io/github/issues/Udhay-Adithya/vitap-vtop-client" alt="License: MIT">
     </a>
