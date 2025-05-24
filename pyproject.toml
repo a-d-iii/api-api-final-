@@ -2,7 +2,7 @@
 name = "vitap-vtop-client"
 version = "0.1.0"
 description = "A Pythonic interface to interact with the VIT-AP VTOP student portal."
-authors = ["Udhay Adithya <udhayxd@example.com>"]
+authors = ["Udhay Adithya udhayxd@gamil.com"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/Udhay-Adithya/vitap-vtop-client"
