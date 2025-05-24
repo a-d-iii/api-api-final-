@@ -34,6 +34,7 @@ from .grade_history import fetch_grade_history, GradeHistoryModel
 from .mentor import fetch_mentor_info, MentorModel
 from .profile import fetch_profile, StudentProfileModel
 from .exam_schedule import fetch_exam_schedule, ExamScheduleModel
+from .marks import fetch_marks, MarksModel
 
 
 class VtopClient:
@@ -271,7 +272,7 @@ class VtopClient:
         Fetches all exam schedules for the given semester.
 
         Returns:
-            A StudentProfileModel containing the parsed student details.
+            A ExamScheduleModel containing the parsed exam schedule details.
         """
         logged_in_info = await self._ensure_logged_in()
         return await fetch_exam_schedule(
@@ -281,17 +282,20 @@ class VtopClient:
             semSubID=sem_sub_id,
         )
 
-    # --- Other VTOP feature methods here ---
-    # Example:
-    # async def get_marks(self, some_identifier: str) -> dict:
-    #    logged_in_info = await self._ensure_logged_in()
-    #    return await fetch_marks_data(
-    #        client=self._client,
-    #        username=logged_in_info.registration_number,
-    #        csrf_token=logged_in_info.post_login_csrf_token,
-    #        # ...other params for marks...
-    #        identifier=some_identifier
-    #    )
+    async def get_marks(self, sem_sub_id: str) -> MarksModel:
+        """
+        Fetches all marks for the given semester.
+
+        Returns:
+            A MarksModel containing the parsed mark details.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_marks(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            csrf_token=logged_in_info.post_login_csrf_token,
+            semSubID=sem_sub_id,
+        )
 
     async def close(self):
         """
