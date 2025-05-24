@@ -85,6 +85,20 @@ class VtopMarksError(VitapVtopClientError):
         super().__init__(message, status_code)
 
 
+class VtopGeneralOutingError(VitapVtopClientError):
+    """Raised when fetching/posting marks fails due to data parsing, invalid semester id, server-side validation, etc."""
+
+    def __init__(self, message: str, status_code: int | None = None):
+        super().__init__(message, status_code)
+
+
+class VtopWeekendOutingError(VitapVtopClientError):
+    """Raised when fetching/posting marks fails due to data parsing, invalid semester id, server-side validation, etc."""
+
+    def __init__(self, message: str, status_code: int | None = None):
+        super().__init__(message, status_code)
+
+
 class VtopCaptchaError(VtopLoginError):
     """Raised for errors specifically related to CAPTCHA fetching or solving."""
 

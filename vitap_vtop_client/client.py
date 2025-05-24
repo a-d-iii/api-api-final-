@@ -11,10 +11,6 @@ from .exceptions import (
     VtopConnectionError,
     VtopSessionError,
     VitapVtopClientError,
-    VtopCsrfError,
-    VtopAttendanceError,
-    VtopBiometricError,
-    VtopTimetableError,
 )
 
 from .login import (
@@ -35,6 +31,14 @@ from .mentor import fetch_mentor_info, MentorModel
 from .profile import fetch_profile, StudentProfileModel
 from .exam_schedule import fetch_exam_schedule, ExamScheduleModel
 from .marks import fetch_marks, MarksModel
+from .outing import (
+    fetch_general_outing_requests,
+    fetch_weekend_outing_requests,
+    submit_general_outing_request,
+    submit_weekend_outing_request,
+    WeekendOutingModel,
+    GeneralOutingModel,
+)
 
 
 class VtopClient:
@@ -295,6 +299,34 @@ class VtopClient:
             registration_number=logged_in_info.registration_number,
             csrf_token=logged_in_info.post_login_csrf_token,
             semSubID=sem_sub_id,
+        )
+
+    async def get_weekend_outing_requests(self) -> WeekendOutingModel:
+        """
+        Fetches all the previously submitted Weekend Outing requests.
+
+        Returns:
+            A WeekendOutingModel containing the previously submitted Weekend Outing details.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_weekend_outing_requests(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            csrf_token=logged_in_info.post_login_csrf_token,
+        )
+
+    async def get_general_outing_requests(self) -> GeneralOutingModel:
+        """
+        Fetches all the previously submitted Genneral Outing requests.
+
+        Returns:
+            A GeneralOutingModel containing the previously submitted General Outing details.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_general_outing_requests(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            csrf_token=logged_in_info.post_login_csrf_token,
         )
 
     async def close(self):
