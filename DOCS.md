@@ -3,12 +3,12 @@
 Welcome to the `vitap-vtop-client` documentation. This library provides a Pythonic interface to interact with the VIT-AP VTOP student portal, simplifying tasks like fetching academic data, profile information, and more.
 
 ## Table of Contents
-1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Getting Started](#getting-started)
+1. [Introduction](#1-introduction)
+2. [Installation](#2-installation)
+3. [Getting Started](#3-getting-started)
     - [Initializing the Client](#initializing-the-client)
     - [Basic Usage Pattern](#basic-usage-pattern)
-4. [API Reference](#api-reference)
+4. [API Reference](#4-api-reference)
     - [`VtopClient`](#vtopclient)
         - [`get_attendance(sem_sub_id)`](#get_attendance)
         - [`get_biometric(date)`](#get_biometric)
@@ -16,7 +16,7 @@ Welcome to the `vitap-vtop-client` documentation. This library provides a Python
         - [`get_grade_history()`](#get_grade_history)
         - [`get_mentor()`](#get_mentor)
         - [`get_profile()`](#get_profile)
-5. [Data Models](#data-models)
+5. [Data Models](#5-data-models)
     - [`AttendanceModel`](#attendancemodel)
     - [`BiometricModel`](#biometricmodel)
     - [`TimetableModel`](#timetablemodel)
@@ -24,11 +24,11 @@ Welcome to the `vitap-vtop-client` documentation. This library provides a Python
     - [`MentorModel`](#mentormodel)
     - [`StudentProfileModel`](#studentprofilemodel)
     - [`LoggedInStudent`](#loggedinstudent)
-6. [Error Handling](#error-handling)
+6. [Error Handling](#6-error-handling)
 7. [Semester IDs (`sem_sub_id`)](#7-semester-ids-sem_sub_id)
-8. [Contributing](#contributing)
-9. [Code of Conduct](#code-of-conduct)
-10. [License](#license)
+8. [Contributing](#8-contributing)
+9. [Code of Conduct](#9-code-of-conduct)
+10. [License](#10-license)
 
 ## 1. Introduction
 
@@ -202,45 +202,96 @@ Fetches the complete student profile, including personal details, mentor informa
     # Access profile.base64_pfp for the profile picture
     ```
 
+#### `get_exam_schedule(sem_sub_id: str)`
+Fetches all the available exam schedules for the specified semester.
+
+-   **Parameters:**
+    -   `sem_sub_id` (str): The semester ID. See [Semester IDs](#semester-ids-sem_sub_id).
+-   **Returns:** `ExamScheduleModel` - An object representing the exam schedules.
+-   **Raises:** `VtopExamScheduleError`, `VtopLoginError`, `VtopConnectionError`, `VtopParsingError`.
+-   **Example:**
+    ```python
+    # ... inside async with VtopClient ...
+    fall_sem_2024_25 = "AP2024252" # Example Semester ID
+    exam_schedule = await client.get_exam_schedule(sem_sub_id=fall_sem_2024_25)
+    if exam_schedule: # ExamScheduleModel might be empty if no exams found
+        print(exam_schedule)
+    else:
+        print("Exams not found or empty.")
+    ```
+
+#### `get_marks(sem_sub_id: str)`
+Fetches available marks for the specified semester.
+
+-   **Parameters:**
+    -   `sem_sub_id` (str): The semester ID. See [Semester IDs](#semester-ids-sem_sub_id).
+-   **Returns:** `MarksModel` - An object representing the exam schedules.
+-   **Raises:** `VtopMarksError`, `VtopLoginError`, `VtopConnectionError`, `VtopParsingError`.
+-   **Example:**
+    ```python
+    # ... inside async with VtopClient ...
+    fall_sem_2024_25 = "AP2024252" # Example Semester ID
+    marks = await client.get_marks(sem_sub_id=fall_sem_2024_25)
+    if marks: # MarksModel might be empty if no exams found
+        print(marks)
+    else:
+        print("marks not found or empty.")
+    ```
+
+#### `get_weekend_outing_requests()`
+Fetches the previously made weekend outing requests.
+
+-   **Returns:** `WeekendOutingModel` - A list of  previously made weekend outing requests.
+-   **Raises:** `VtopWeekendOutingError`, `VtopSessionError`, `VtopConnectionError`, `VtopParsingError`.
+-   **Example:**
+    ```python
+    # ... inside async with VtopClient ...
+    reqs = await client.get_weekend_outing_requests()
+    if reqs:
+        print(reqs)
+    ```
+
+#### `get_general_outing_requests()`
+Fetches the previously made general outing requests.
+
+-   **Returns:** `GeneralOutingModel` - A list of  previously made general outing requests.
+-   **Raises:** `VtopGeneralOutingError`, `VtopSessionError`, `VtopConnectionError`, `VtopParsingError`.
+-   **Example:**
+    ```python
+    # ... inside async with VtopClient ...
+    reqs = await client.get_general_outing_requests()
+    if reqs:
+        print(reqs)
+    ```
+
 ## 5. Data Models
 
 The library uses Pydantic models to structure the data returned from VTOP.
 
 Refer to the model definitions in:
--   [`src/attendance/model/attendance_model.py`](src/attendance/model/attendance_model.py) for `AttendanceModel`
--   [`src/biometric/model/biometric_model.py`](src/biometric/model/biometric_model.py) for `BiometricModel`
--   [`src/timetable/model/timetable_model.py`](src/timetable/model/timetable_model.py) for `TimetableModel`
--   [`src/grade_history/model/grade_history_model.py`](src/grade_history/model/grade_history_model.py) for `GradeHistoryModel`
--   [`src/mentor/model/mentor_model.py`](src/mentor/model/mentor_model.py) for `MentorModel`
--   [`src/profile/model/profile_model.py`](src/profile/model/profile_model.py) for `StudentProfileModel`
--   [`src/login/model/login_model.py`](src/login/model/login_model.py) for `LoggedInStudent`
 
-### `AttendanceModel`
-Represents attendance for a single course.
-Key attributes: `course_code`, `course_name`, `attended_classes`, `total_classes`, `attendance_percentage`.
+-   [`vitap_vtop_client/outing/model/general_outing_model.py`](vitap_vtop_client/outing/model/general_outing_model.py) for `GeneralOutingModel`
 
-### `BiometricModel`
-Represents a single biometric log entry.
-Key attributes: `time`, `location`.
+-   [`vitap_vtop_client/attendance/model/attendance_model.py`](vitap_vtop_client/outing/model/weekend_outing_model.py) for `WeekendOutingModel`
 
-### `TimetableModel`
-Represents the weekly timetable. Contains a dictionary `days` where keys are day names (e.g., "Monday") and values are lists of course slots for that day.
+-   [`vitap_vtop_client/marks/model/marks_model.py`](vitap_vtop_client/marks/model/marks_model.py) for `MarksModel`
 
-### `GradeHistoryModel`
-Represents the student's overall grade summary.
-Key attributes: `credits_registered`, `credits_earned`, `cgpa`.
+-   [`vitap_vtop_client/exam_schedule/model/exam_schedule_model.py`](vitap_vtop_client/exam_schedule/model/exam_schedule_model.py) for `ExamScheduleModel`
 
-### `MentorModel`
-Represents details of the faculty mentor.
-Key attributes: `faculty_name`, `faculty_email`, `faculty_designation`, `cabin`.
+-   [`vitap_vtop_client/attendance/model/attendance_model.py`](vitap_vtop_client/attendance/model/attendance_model.py) for `AttendanceModel`
 
-### `StudentProfileModel`
-A comprehensive model for student details.
-Key attributes: `student_name`, `application_number`, `email`, `dob`, `base64_pfp` (profile picture), `mentor_details` (`MentorModel`), `grade_history` (`GradeHistoryModel`).
+-   [`vitap_vtop_client/biometric/model/biometric_model.py`](vitap_vtop_client/biometric/model/biometric_model.py) for `BiometricModel`
 
-### `LoggedInStudent`
-Internal model representing the state after a successful login.
-Key attributes: `registration_number`, `session_cookie`, `post_login_csrf_token`.
+-   [`vitap_vtop_client/timetable/model/timetable_model.py`](vitap_vtop_client/timetable/model/timetable_model.py) for `TimetableModel`
+
+-   [`vitap_vtop_client/grade_history/model/grade_history_model.py`](vitap_vtop_client/grade_history/model/grade_history_model.py) for `GradeHistoryModel`
+
+-   [`vitap_vtop_client/mentor/model/mentor_model.py`](vitap_vtop_client/mentor/model/mentor_model.py) for `MentorModel`
+
+-   [`vitap_vtop_client/profile/model/profile_model.py`](vitap_vtop_client/profile/model/profile_model.py) for `StudentProfileModel`
+
+-   [`vitap_vtop_client/login/model/login_model.py`](vitap_vtop_client/login/model/login_model.py) for `LoggedInStudent`
+
 
 ## 6. Error Handling
 
@@ -280,25 +331,25 @@ except Exception as e: # General Python errors
 ## 7. Semester IDs (`sem_sub_id`)
 
 Many functions require a `sem_sub_id` to specify the semester. These IDs are specific to VIT-AP's VTOP system.
-You can find a list of common `SemSubID` values in [`src/constants.py`](src/constants.py).
+You can find a list of common `SemSubID` values in [`vitap_vtop_client/constants.py`](/vitap_vtop_client/constants.py).
 
 Some examples:
--   `"AP2024252"`: FALL SEM 2024-25
--   `"AP2024256"`: Long Semester 2024-25
--   `"AP2023246"`: WIN SEM (2023-24)
--   `"AP2023242"`: FALL SEM (2023-24) Regular
+-   `"AP2024254"`: Winter Semester 2024-25
+-   `"AP2024255"`: Winter Semester 2024-25 Freshers
+-   `"AP2024253"`: FALL SEM 2024-25
+-   `"AP2024252"`: FALL SEM 2024-25 FRESHERS
 
-It's recommended to refer to [`src/constants.py`](src/constants.py) for the most up-to-date list or to discover IDs for other semesters.
+It's recommended to refer to [`vitap_vtop_client/constants.py`](/vitap_vtop_client/constants.py) for the most up-to-date list or to discover IDs for other semesters.
 
 ## 8. Contributing
 
 Contributions are highly welcome! Whether it's bug fixes, feature enhancements, or documentation improvements, please feel free to contribute.
-Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project, including development setup and pull request procedures.
+Please read the [CONTRIBUTING.md](/CONTRIBUTING.md) file for guidelines on how to contribute to this project, including development setup and pull request procedures.
 
 ## 9. Code of Conduct
 
-All participants are expected to follow the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Please ensure you are familiar with its contents.
+All participants are expected to follow the [CODE_OF_CONDUCT.md](/CODE_OF_CONDUCT.md). Please ensure you are familiar with its contents.
 
 ## 10. License
 
-This project is licensed under the Apache License, Version 2.0. See the `LICENSE` file (usually `LICENSE` or `LICENSE.txt`, though not explicitly listed in your project structure, it's mentioned in `README.md`) for details.
+This project is licensed under the Apache License, Version 2.0. See the [`LICENSE`](/LICENSE) for details.

@@ -22,7 +22,7 @@ async def fetch_timetable(
         csrf_token (str): The CSRF token used for form validation.
 
     Returns:
-        TimetableModel]: A TimetableModel containing the parsed timetable details.
+        TimetableModel: A TimetableModel containing the parsed timetable details.
 
     Raises:
         VtopConnectionError: If an HTTP request fails.
