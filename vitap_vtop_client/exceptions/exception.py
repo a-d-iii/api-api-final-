@@ -33,12 +33,12 @@ class VtopTimetableError(VitapVtopClientError):
         super().__init__(message, status_code)
 
 class VtopGradeHistoryError(VitapVtopClientError):
-    """Raised when fetching greades history fails due to data parsing, invalid date, server-side validation, etc."""
+    """Raised when fetching greades history fails due to data parsing, invalid semester id, server-side validation, etc."""
     def __init__(self, message: str, status_code: int | None = None):
         super().__init__(message, status_code)
 
 class VtopMentorError(VitapVtopClientError):
-    """Raised when fetching biometric fails due to data parsing, invalid date, server-side validation, etc."""
+    """Raised when fetching biometric fails due to data parsing, server-side validation, etc."""
     def __init__(self, message: str, status_code: int | None = None):
         super().__init__(message, status_code)
 
@@ -46,8 +46,15 @@ class VtopBiometricError(VitapVtopClientError):
     """Raised when fetching biometric fails due to data parsing, invalid date, server-side validation, etc."""
     def __init__(self, message: str, status_code: int | None = None):
         super().__init__(message, status_code)
+
 class VtopProfileError(VitapVtopClientError):
-    """Raised when fetching biometric fails due to data parsing, invalid date, server-side validation, etc."""
+    """Raised when fetching biometric fails due to data parsing, server-side validation, etc."""
+    def __init__(self, message: str, status_code: int | None = None):
+        super().__init__(message, status_code)
+
+class VtopExamScheduleError(VitapVtopClientError):
+    """Raised when fetching exam schedule fails due to data parsing, invalid semester id, server-side validation, etc."""
+
     def __init__(self, message: str, status_code: int | None = None):
         super().__init__(message, status_code)
 
