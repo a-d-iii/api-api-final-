@@ -2,7 +2,9 @@ from typing import Dict, List
 from pydantic import BaseModel
 
 
+# One day's schedule:
 class Course(BaseModel):
+    time: str
     course_name: str
     slot: str
     venue: str
@@ -11,16 +13,12 @@ class Course(BaseModel):
     course_type: str
 
 
-# One day's schedule: key is the time slot, value is a Course
-TimeSlot = Dict[str, Course]
-
-
 # Weekly timetable: key is the day, value is list of time slots (lectures)
 class TimetableModel(BaseModel):
-    Monday: List[TimeSlot] = []
-    Tuesday: List[TimeSlot] = []
-    Wednesday: List[TimeSlot] = []
-    Thursday: List[TimeSlot] = []
-    Friday: List[TimeSlot] = []
-    Saturday: List[TimeSlot] = []
-    Sunday: List[TimeSlot] = []
+    Monday: List[Course] = []
+    Tuesday: List[Course] = []
+    Wednesday: List[Course] = []
+    Thursday: List[Course] = []
+    Friday: List[Course] = []
+    Saturday: List[Course] = []
+    Sunday: List[Course] = []

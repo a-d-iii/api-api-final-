@@ -121,42 +121,84 @@ def update_timetable_with_course_info(
     timetable_data: dict[str, list], courses_list: list
 ) -> TimetableModel:
     try:
-        for day, timeslots in timetable_data.items():
-            for slot in range(len(timeslots)):
-                for timeslot, course_info in timeslots[slot].items():
-                    course_code = course_info.split("-")[1]
-                    course_venue = str(
-                        course_info.split("-")[3] + "-" + course_info.split("-")[4]
-                    )
-                    course_type = course_info.split("-")[2]
+        for day in timetable_data:
+            for slot_idx in range(len(timetable_data[day])):
+                slot_entry = timetable_data[day][slot_idx]
+                # Extract timeslot and course info from the dictionary
+                time_slot = slot_entry["time"]
+                course_info_str = slot_entry["course_info"]
 
-                    for course in courses_list:
-                        if course_code in course:
-                            course_data = course[course_code]
-                            venue_match = course_data["venue"].split("-")
-                            if course_venue == f"{venue_match[0]}-{venue_match[1]}":
-                                timetable_data[day][slot][timeslot] = {
-                                    "course_name": course_data["course_name"],
-                                    "slot": course_data["slot"],
-                                    "venue": course_data["venue"],
-                                    "faculty": course_data["faculty"],
-                                    "course_code": course_code,
-                                    "course_type": course_type,
-                                }
+                # Parse course_info_str to get code, venue, and type
+                parts = course_info_str.split("-")
+                if len(parts) < 5:
+                    # Create a basic course entry for invalid entries
+                    timetable_data[day][slot_idx] = {
+                        "course_name": "Unknown",
+                        "slot": "N/A",
+                        "venue": "N/A",
+                        "faculty": "N/A",
+                        "course_code": "N/A",
+                        "course_type": "N/A",
+                        "time": time_slot,
+                    }
+                    continue
+
+                course_code = parts[1].strip()
+                course_venue = f"{parts[3].strip()}-{parts[4].strip()}"
+                course_type = parts[2].strip()
+
+                # Find matching course in courses_list
+                course_found = False
+                for course in courses_list:
+                    if course_code in course:
+                        course_data = course[course_code]
+                        # Check if venue matches
+                        venue_parts = course_data["venue"].split("-")
+                        if len(venue_parts) < 2:
+                            continue
+                        formatted_venue = f"{venue_parts[0]}-{venue_parts[1]}"
+                        if course_venue == formatted_venue:
+                            # Create new Course dict with time included
+                            new_course = {
+                                "course_name": course_data["course_name"],
+                                "slot": course_data["slot"],
+                                "venue": course_data["venue"],
+                                "faculty": course_data["faculty"],
+                                "course_code": course_code,
+                                "course_type": course_type,
+                                "time": time_slot,
+                            }
+                            # Replace the dictionary entry with the new Course
+                            timetable_data[day][slot_idx] = new_course
+                            course_found = True
+                            break
+
+                # If no matching course found, create a basic entry
+                if not course_found:
+                    timetable_data[day][slot_idx] = {
+                        "course_name": "Unknown",
+                        "slot": "N/A",
+                        "venue": course_venue,
+                        "faculty": "N/A",
+                        "course_code": course_code,
+                        "course_type": course_type,
+                        "time": time_slot,
+                    }
+
         return TimetableModel(**timetable_data)
     except Exception as e:
-        raise VtopParsingError(f"Error updating timetable with course info: {e}")
+        raise VtopParsingError(f"Error updating timetable: {e}")
 
 
 def parse_time_table(html: str) -> TimetableModel:
     time_table_data = {
+        "Monday": [],
         "Tuesday": [],
         "Wednesday": [],
         "Thursday": [],
         "Friday": [],
         "Saturday": [],
         "Sunday": [],
-        "Monday": [],
     }
 
     lst_table = []
@@ -166,35 +208,42 @@ def parse_time_table(html: str) -> TimetableModel:
         time_table = soup.find(id="timeTableStyle")
 
         if not time_table:
-            print("Timetable not found for the given semester")
             return TimetableModel()
 
         tr_tags = time_table.find_all("tr")[4:]
+
+        # Parse table rows into lst_table
         for tr_tag in tr_tags:
-            tr_string = str(tr_tag.get_text(strip=False))
-            lines = list(filter(None, tr_string.split("\n")))
+            tr_text = tr_tag.get_text(strip=False)
+            lines = [line.strip() for line in tr_text.split("\n") if line.strip()]
             lst_table.append(lines)
 
+        # Process theory sessions (even-indexed rows)
         for day, line in zip(
             ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], lst_table[::2]
         ):
             for j in range(min(len(line), len(theory_timings))):
-                if len(line[j]) > 8 and line[j] not in {"CLUBS/ECS", "ECS/CLUBS"}:
-                    time_table_data[day].append({theory_timings[j]: line[j]})
+                if line[j] not in {"-", "Lunch", "CLUBS/ECS", "ECS/CLUBS"}:
+                    time_slot = theory_timings[j]
+                    time_table_data[day].append(
+                        {"time": time_slot, "course_info": line[j]}
+                    )
 
+        # Process lab sessions (odd-indexed rows)
         for day, line in zip(
             ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], lst_table[1::2]
         ):
             for j in range(min(len(line), len(lab_timings))):
-                if line[j] not in {"-", "Lunch", ""}:
+                if line[j] not in {"-", "Lunch"}:
                     time_slot = lab_timings[j]
-                    time_table_data[day].append({time_slot: line[j]})
+                    time_table_data[day].append(
+                        {"time": time_slot, "course_info": line[j]}
+                    )
 
+        # Cleanup: Remove invalid entries
         for day, sessions in time_table_data.items():
             time_table_data[day] = [
-                session
-                for session in sessions
-                if all(len(value) >= 8 for value in session.values())
+                session for session in sessions if len(session["course_info"]) >= 8
             ]
 
         courses_list = get_course_info(html)
