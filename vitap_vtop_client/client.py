@@ -92,12 +92,14 @@ class VtopClient:
         """
         for attempt in range(self.max_login_retries):
             print(
-                f"VtopClient: Login attempt {attempt + 1}/{self.max_login_retries} for user {self.username}"
+                f"VtopClient: Login attempt {attempt + 1}/{self.max_login_retries} for user {self.username[:5]}****"
             )
             try:
                 # Step 1: Fetch initial CSRF token
                 csrf_token = await fetch_csrf_token(self._client)
-                print(f"VtopClient: CSRF TOKEN: {csrf_token}")
+                print(
+                    f"VtopClient: CSRF TOKEN: {csrf_token[:8]} - **** - **** - ************"
+                )
 
                 # Step 2: Pre-login setup
                 await pre_login(self._client, csrf_token)
@@ -118,7 +120,7 @@ class VtopClient:
                     captcha_value,
                 )
                 self._logged_in_student = logged_in_student
-                print(f"VtopClient: Login successful for {self.username}")
+                print(f"VtopClient: Login successful for {self.username[:5]}****")
                 return logged_in_student
 
             except VtopCaptchaError as e:
@@ -163,7 +165,7 @@ class VtopClient:
             # Double-check after acquiring the lock, in case another coroutine logged in
             if self._logged_in_student is None:
                 print(
-                    f"VtopClient: Not logged in or session expired for {self.username}. Initiating login."
+                    f"VtopClient: Not logged in or session expired for {self.username[:5]}****. Initiating login."
                 )
                 await self._perform_login_sequence()
 

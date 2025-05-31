@@ -1,9 +1,16 @@
 import httpx
-from vitap_vtop_client.constants import VTOP_BASE_URL, VTOP_LOGIN_ERROR_URL, VTOP_LOGIN_URL, VTOP_CONTENT_URL, HEADERS
+from vitap_vtop_client.constants import (
+    VTOP_BASE_URL,
+    VTOP_LOGIN_ERROR_URL,
+    VTOP_LOGIN_URL,
+    VTOP_CONTENT_URL,
+    HEADERS,
+)
 from vitap_vtop_client.exceptions.exception import VtopConnectionError, VtopLoginError
 from vitap_vtop_client.login.model.logged_in_student_model import LoggedInStudent
 from vitap_vtop_client.utils import find_login_response
-from vitap_vtop_client.utils import find_csrf 
+from vitap_vtop_client.utils import find_csrf
+
 
 # TODO: Implement retry mechanism for Captch Failures
 async def student_login(
@@ -12,7 +19,7 @@ async def student_login(
     registration_number: str,
     password: str,
     captcha_value: str,
-) -> LoggedInStudent :
+) -> LoggedInStudent:
     """
     Attempts to log in to the VTOP system using provided credentials and captcha.
 
@@ -43,36 +50,44 @@ async def student_login(
         response = await client.post(VTOP_LOGIN_URL, data=data, headers=HEADERS)
         print(response.url)
 
-        if (response.url == VTOP_BASE_URL+VTOP_CONTENT_URL):
-            print(f"Login successful for user {registration_number}. Redirected to content page.")
+        if response.url == VTOP_BASE_URL + VTOP_CONTENT_URL:
+            print(
+                f"Login successful for user {registration_number[:5]}****. Redirected to content page."
+            )
             # After successful login, we need to get the new CSRF token from the content page
             # for subsequent requests.
             content_resp = await client.get(VTOP_CONTENT_URL, headers=HEADERS)
             print(response.cookies)
             post_login_csrf = find_csrf(content_resp.text)
-            logged_in_student = {"registration_number": registration_number, "post_login_csrf_token": post_login_csrf}
+            logged_in_student = {
+                "registration_number": registration_number,
+                "post_login_csrf_token": post_login_csrf,
+            }
             return LoggedInStudent(**logged_in_student)
 
-        elif(response.url == VTOP_BASE_URL+VTOP_LOGIN_ERROR_URL):
+        elif response.url == VTOP_BASE_URL + VTOP_LOGIN_ERROR_URL:
             error_message = find_login_response.login_error_identifier(response.text)
             print(f"Login Credential Error: ${error_message}")
-            raise VtopLoginError(f"${error_message}", status_code=401) # Unauthorized
+            raise VtopLoginError(f"${error_message}", status_code=401)  # Unauthorized
 
         else:
             # Landed on an unexpected page after login POST
-            print(f"Login failed for user {registration_number}. Unexpected redirection to {response.url}. Status: {response.status_code}")
-            raise VtopLoginError(f"Login failed: Unexpected redirection after POST to {response.url}", status_code=response.status_code)
+            print(
+                f"Login failed for user {registration_number}. Unexpected redirection to {response.url}. Status: {response.status_code}"
+            )
+            raise VtopLoginError(
+                f"Login failed: Unexpected redirection after POST to {response.url}",
+                status_code=response.status_code,
+            )
 
     except httpx.RequestError as e:
         print(f"Login POST request failed: Network Error {e}")
         raise VtopConnectionError(
-                f"Login request failed: {e}",
-                original_exception=e,
-                status_code=502
-            )
+            f"Login request failed: {e}", original_exception=e, status_code=502
+        )
     except VtopLoginError as e:
-        raise e 
-    
+        raise e
+
     except Exception as e:
         print(f"An unexpected error occurred during login process: {e}")
         raise VtopLoginError(f"An unexpected error occurred during login: {e}") from e
