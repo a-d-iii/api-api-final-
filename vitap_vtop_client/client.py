@@ -2,6 +2,10 @@ import string
 import httpx
 import asyncio
 
+from vitap_vtop_client.utils.validate_registration_number import (
+    validate_registration_number,
+)
+
 
 from .constants import VTOP_BASE_URL
 
@@ -67,13 +71,7 @@ class VtopClient:
                 "Registration number and password are required for VtopClient.",
                 status_code=400,
             )
-        # TODO: Basic validation, improve this
-        if len(registration_number) < 5 or any(
-            c in string.punctuation for c in registration_number
-        ):
-            raise VtopLoginError(
-                "Invalid Registration number format for VtopClient.", status_code=400
-            )
+        validate_registration_number(registration_number)
 
         self.username = registration_number.upper()
         self.password = password

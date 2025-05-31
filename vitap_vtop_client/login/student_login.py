@@ -48,7 +48,6 @@ async def student_login(
             "captchaStr": captcha_value,
         }
         response = await client.post(VTOP_LOGIN_URL, data=data, headers=HEADERS)
-        print(response.url)
 
         if response.url == VTOP_BASE_URL + VTOP_CONTENT_URL:
             print(
@@ -57,7 +56,6 @@ async def student_login(
             # After successful login, we need to get the new CSRF token from the content page
             # for subsequent requests.
             content_resp = await client.get(VTOP_CONTENT_URL, headers=HEADERS)
-            print(response.cookies)
             post_login_csrf = find_csrf(content_resp.text)
             logged_in_student = {
                 "registration_number": registration_number,
