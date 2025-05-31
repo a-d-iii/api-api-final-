@@ -85,4 +85,4 @@ async def fetch_attendance(
             )
     except Exception as e:
         print(f"An unexpected error occurred while fetching or parsing attendance: {e}")
-        raise VtopAttendanceError(f"An unexpected error occurred while fetching attendance for semester ${semSubID}: {e}") from e
+        raise VtopAttendanceError(f"An unexpected error occurred while fetching attendance for semester {semSubID}: {e}") from e

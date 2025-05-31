@@ -65,8 +65,8 @@ async def student_login(
 
         elif response.url == VTOP_BASE_URL + VTOP_LOGIN_ERROR_URL:
             error_message = find_login_response.login_error_identifier(response.text)
-            print(f"Login Credential Error: ${error_message}")
-            raise VtopLoginError(f"${error_message}", status_code=401)  # Unauthorized
+            print(f"Login Credential Error: {error_message}")
+            raise VtopLoginError(f"{error_message}", status_code=401)  # Unauthorized
 
         else:
             # Landed on an unexpected page after login POST

@@ -72,12 +72,12 @@ async def fetch_biometric(
         raise e
 
     except httpx.RequestError as e:
-        print(f"Biometric fetch failed for the date ${date}: {e}")
+        print(f"Biometric fetch failed for the date {date}: {e}")
         raise VtopConnectionError(
-                f"Biometric fetch failed for the date ${date}: {e}",
+                f"Biometric fetch failed for the date {date}: {e}",
                 original_exception=e,
                 status_code=502
             )
     except Exception as e:
         print(f"An unexpected error occurred while fetching or parsing biometric: {e}")
-        raise VtopBiometricError(f"An unexpected error occurred while fetching or parsing biometric for the data ${date}: {e}") from e
+        raise VtopBiometricError(f"An unexpected error occurred while fetching or parsing biometric for the data {date}: {e}") from e
