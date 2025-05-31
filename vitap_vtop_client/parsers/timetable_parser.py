@@ -6,58 +6,35 @@ from vitap_vtop_client.timetable.model import TimetableModel
 # Current implementation is very sensitive to changes
 
 
-theory_timings = [
-    "DAY",
-    "TYPE",
-    "08:00 - 08:50",
-    "09:00 - 09:50",
-    "09:00 - 09:50",
-    "10:00 - 10:50",
-    "10:00 - 10:50",
-    "11:00 - 11:50",
-    "11:00 - 11:50",
-    "12:00 - 12:50",
-    "12:00 - 12:50",
-    "13:00 - 13:50",
-    "Lunch",
-    "14:00 - 14:50",
-    "14:00 - 14:50",
-    "15:00 - 15:50",
-    "15:00 - 15:50",
-    "16:00 - 16:50",
-    "16:00 - 16:50",
-    "17:00 - 17:50",
-    "17:00 - 17:50",
-    "18:00 - 18:50",
-    "18:00 - 18:50",
-    "19:00 - 19:50",
-]
+def parse_timeslots(header_rows):
+    """Parse timeslots from timetable header rows."""
+    if len(header_rows) < 4:
+        raise VtopParsingError("Insufficient header rows for timeslot parsing")
 
-lab_timings = [
-    "TYPE",
-    "08:00 - 08:50",
-    "09:00 - 09:50",
-    "09:00 - 09:50",
-    "09:50 - 10:40",
-    "09:50 - 10:40",
-    "11:00 - 11:50",
-    "11:00 - 11:50",
-    "11:50 - 12:40",
-    "11:50 - 12:40",
-    "12:50 - 13:30",
-    "Lunch",
-    "14:00 - 14:50",
-    "14:00 - 14:50",
-    "14:50 - 15:40",
-    "14:50 - 15:40",
-    "16:00 - 16:50",
-    "16:00 - 16:50",
-    "16:50 - 17:40",
-    "16:50 - 17:40",
-    "18:00 - 18:50",
-    "18:00 - 18:50",
-    "18:50 - 19:30",
-]
+    # Process THEORY timeslots (first two rows)
+    theory_starts = [
+        td.get_text(strip=True) for td in header_rows[0].find_all("td")[2:]
+    ]
+    theory_ends = [td.get_text(strip=True) for td in header_rows[1].find_all("td")[1:]]
+    theory_ends = theory_ends[: len(theory_starts)]  # Ensure equal length
+
+    # Process LAB timeslots (next two rows)
+    lab_starts = [td.get_text(strip=True) for td in header_rows[2].find_all("td")[2:]]
+    lab_ends = [td.get_text(strip=True) for td in header_rows[3].find_all("td")[1:]]
+    lab_ends = lab_ends[: len(lab_starts)]  # Ensure equal length
+
+    # Combine start and end times
+    theory_timings = [
+        "Lunch" if start == "Lunch" and end == "Lunch" else f"{start} - {end}"
+        for start, end in zip(theory_starts, theory_ends)
+    ]
+
+    lab_timings = [
+        "Lunch" if start == "Lunch" and end == "Lunch" else f"{start} - {end}"
+        for start, end in zip(lab_starts, lab_ends)
+    ]
+
+    return theory_timings, lab_timings
 
 
 def get_course_info(html: str) -> list:
@@ -191,63 +168,110 @@ def update_timetable_with_course_info(
 
 
 def parse_time_table(html: str) -> TimetableModel:
-    time_table_data = {
-        "Monday": [],
-        "Tuesday": [],
-        "Wednesday": [],
-        "Thursday": [],
-        "Friday": [],
-        "Saturday": [],
-        "Sunday": [],
+    # Initialize with all days having empty schedules
+    timetable_data = {
+        day: []
+        for day in [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ]
     }
-
-    lst_table = []
 
     try:
         soup = BeautifulSoup(html, "html.parser")
         time_table = soup.find(id="timeTableStyle")
-
         if not time_table:
             return TimetableModel()
 
-        tr_tags = time_table.find_all("tr")[4:]
+        all_rows = time_table.find_all("tr")
+        if len(all_rows) < 4:
+            return TimetableModel()
 
-        # Parse table rows into lst_table
-        for tr_tag in tr_tags:
-            tr_text = tr_tag.get_text(strip=False)
-            lines = [line.strip() for line in tr_text.split("\n") if line.strip()]
-            lst_table.append(lines)
+        # Parse timeslots from first 4 header rows
+        theory_timings, lab_timings = parse_timeslots(all_rows[:4])
+        data_rows = all_rows[4:]
 
-        # Process theory sessions (even-indexed rows)
-        for day, line in zip(
-            ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], lst_table[::2]
-        ):
-            for j in range(min(len(line), len(theory_timings))):
-                if line[j] not in {"-", "Lunch", "CLUBS/ECS", "ECS/CLUBS"}:
-                    time_slot = theory_timings[j]
-                    time_table_data[day].append(
-                        {"time": time_slot, "course_info": line[j]}
+        # Day mapping from abbreviations to full names
+        day_mapping = {
+            "MON": "Monday",
+            "TUE": "Tuesday",
+            "WED": "Wednesday",
+            "THU": "Thursday",
+            "FRI": "Friday",
+            "SAT": "Saturday",
+            "SUN": "Sunday",
+        }
+
+        # Process each pair of rows (THEORY + LAB)
+        i = 0
+        while i < len(data_rows):
+            # Extract day name from the first cell of the THEORY row
+            day_cell = data_rows[i].find("td")
+            if not day_cell:
+                i += 1
+                continue
+
+            day_abbr = day_cell.get_text(strip=True)
+            day_name = day_mapping.get(day_abbr, day_abbr)
+
+            # Process THEORY row
+            theory_cells = data_rows[i].find_all("td")
+            # Skip first two cells (day and "THEORY" label)
+            theory_slots = (
+                [
+                    cell.get_text(strip=True)
+                    for cell in theory_cells[2 : 2 + len(theory_timings)]
+                ]
+                if len(theory_cells) > 2
+                else []
+            )
+
+            # Process LAB row if available
+            lab_slots = []
+            if i + 1 < len(data_rows):
+                lab_cells = data_rows[i + 1].find_all("td")
+                # Skip first cell ("LAB" label)
+                lab_slots = (
+                    [
+                        cell.get_text(strip=True)
+                        for cell in lab_cells[1 : 1 + len(lab_timings)]
+                    ]
+                    if len(lab_cells) > 1
+                    else []
+                )
+
+            # Add THEORY slots to timetable
+            for slot_idx, course_info in enumerate(theory_slots):
+                if course_info not in {"-", "Lunch", "CLUBS/ECS", "ECS/CLUBS"}:
+                    timetable_data[day_name].append(
+                        {"time": theory_timings[slot_idx], "course_info": course_info}
                     )
 
-        # Process lab sessions (odd-indexed rows)
-        for day, line in zip(
-            ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], lst_table[1::2]
-        ):
-            for j in range(min(len(line), len(lab_timings))):
-                if line[j] not in {"-", "Lunch"}:
-                    time_slot = lab_timings[j]
-                    time_table_data[day].append(
-                        {"time": time_slot, "course_info": line[j]}
+            # Add LAB slots to timetable
+            for slot_idx, course_info in enumerate(lab_slots):
+                if course_info not in {"-", "Lunch"}:
+                    timetable_data[day_name].append(
+                        {"time": lab_timings[slot_idx], "course_info": course_info}
                     )
+
+            # Move to next day pair (THEORY + LAB rows)
+            i += 2
 
         # Cleanup: Remove invalid entries
-        for day, sessions in time_table_data.items():
-            time_table_data[day] = [
-                session for session in sessions if len(session["course_info"]) >= 8
+        for day in timetable_data:
+            timetable_data[day] = [
+                session
+                for session in timetable_data[day]
+                if len(session["course_info"]) >= 8
             ]
 
         courses_list = get_course_info(html)
-        return update_timetable_with_course_info(time_table_data, courses_list)
+        return update_timetable_with_course_info(timetable_data, courses_list)
 
     except Exception as e:
         raise VtopParsingError(f"Failed to parse timetable: {e}")
