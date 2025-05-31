@@ -34,9 +34,6 @@ def parse_timeslots(header_rows):
         for start, end in zip(lab_starts, lab_ends)
     ]
 
-    print(theory_timings)
-    print(lab_timings)
-
     return theory_timings, lab_timings
 
 
