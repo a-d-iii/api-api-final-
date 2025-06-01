@@ -4,3 +4,4 @@ test.py
 poetry.lock
 .devenv
 devenv.lock
+.devenv.flake.nix
