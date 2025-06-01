@@ -1,11 +1,6 @@
-import string
+from typing import List
 import httpx
 import asyncio
-
-from vitap_vtop_client.utils.validate_registration_number import (
-    validate_registration_number,
-)
-
 
 from .constants import VTOP_BASE_URL
 
@@ -43,6 +38,7 @@ from .outing import (
     WeekendOutingModel,
     GeneralOutingModel,
 )
+from .payments import fetch_pending_payments, PendingPayment
 
 
 class VtopClient:
@@ -324,6 +320,20 @@ class VtopClient:
         """
         logged_in_info = await self._ensure_logged_in()
         return await fetch_general_outing_requests(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            csrf_token=logged_in_info.post_login_csrf_token,
+        )
+
+    async def get_pending_payments(self) -> List[PendingPayment]:
+        """
+        Fetches a list of pending payments.
+
+        Returns:
+            A list of PendingPayment if found or an empty list.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_pending_payments(
             client=self._client,
             registration_number=logged_in_info.registration_number,
             csrf_token=logged_in_info.post_login_csrf_token,
