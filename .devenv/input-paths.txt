@@ -1,0 +1,7 @@
+/home/synaptic/projects/vitap-vtop-client/.devenv/flake.json
+/home/synaptic/projects/vitap-vtop-client/.devenv.flake.nix
+/home/synaptic/projects/vitap-vtop-client/.env
+/home/synaptic/projects/vitap-vtop-client/devenv.local.nix
+/home/synaptic/projects/vitap-vtop-client/devenv.lock
+/home/synaptic/projects/vitap-vtop-client/devenv.nix
+/home/synaptic/projects/vitap-vtop-client/devenv.yaml

@@ -10,7 +10,7 @@ from vitap_vtop_client.exceptions.exception import VtopConnectionError, VtopLogi
 from vitap_vtop_client.login.model.logged_in_student_model import LoggedInStudent
 from vitap_vtop_client.utils import find_login_response
 from vitap_vtop_client.utils import find_csrf
-
+from vitap_vtop_client.utils.find_registration_number import find_registration_number
 
 # TODO: Implement retry mechanism for Captch Failures
 async def student_login(
@@ -50,12 +50,15 @@ async def student_login(
         response = await client.post(VTOP_LOGIN_URL, data=data, headers=HEADERS)
 
         if response.url == VTOP_BASE_URL + VTOP_CONTENT_URL:
+            
             print(
                 f"Login successful for user {registration_number[:5]}****. Redirected to content page."
             )
             # After successful login, we need to get the new CSRF token from the content page
             # for subsequent requests.
             content_resp = await client.get(VTOP_CONTENT_URL, headers=HEADERS)
+            registration_number = find_registration_number(content_resp)
+            print(f"registration number is {registration_number}  ")
             post_login_csrf = find_csrf(content_resp.text)
             logged_in_student = {
                 "registration_number": registration_number,
