@@ -38,7 +38,12 @@ from .outing import (
     WeekendOutingModel,
     GeneralOutingModel,
 )
-from .payments import fetch_pending_payments, PendingPayment
+from .payments import (
+    fetch_pending_payments,
+    fetch_payment_receipts,
+    PendingPayment,
+    PaymentReceipt,
+)
 
 
 class VtopClient:
@@ -334,6 +339,20 @@ class VtopClient:
         """
         logged_in_info = await self._ensure_logged_in()
         return await fetch_pending_payments(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            csrf_token=logged_in_info.post_login_csrf_token,
+        )
+
+    async def get_payment_receipts(self) -> List[PaymentReceipt]:
+        """
+        Fetches a list of previously made payment receipts.
+
+        Returns:
+            A list of PaymentReceipt if found or an empty list.
+        """
+        logged_in_info = await self._ensure_logged_in()
+        return await fetch_payment_receipts(
             client=self._client,
             registration_number=logged_in_info.registration_number,
             csrf_token=logged_in_info.post_login_csrf_token,
