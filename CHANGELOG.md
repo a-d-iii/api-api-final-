@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.2.5] - 2025-06-01
+
+### Added
+- Add Pending payments retrieval
+
 ---
 
 ## [0.2.4] - 2025-06-01
@@ -15,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Remove registration number validation for now
+
 ---
 
 ## [0.2.3] - 2025-05-31
