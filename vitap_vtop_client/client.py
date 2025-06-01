@@ -71,7 +71,7 @@ class VtopClient:
                 "Registration number and password are required for VtopClient.",
                 status_code=400,
             )
-        validate_registration_number(registration_number)
+        # validate_registration_number(registration_number)
 
         self.username = registration_number.upper()
         self.password = password
