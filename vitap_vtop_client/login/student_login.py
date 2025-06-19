@@ -6,7 +6,11 @@ from vitap_vtop_client.constants import (
     VTOP_CONTENT_URL,
     HEADERS,
 )
-from vitap_vtop_client.exceptions.exception import VtopConnectionError, VtopLoginError
+from vitap_vtop_client.exceptions.exception import (
+    VtopCaptchaSolvingError,
+    VtopConnectionError,
+    VtopLoginError,
+)
 from vitap_vtop_client.login.model.logged_in_student_model import LoggedInStudent
 from vitap_vtop_client.utils import find_login_response
 from vitap_vtop_client.utils import find_csrf
@@ -72,7 +76,10 @@ async def student_login(
         elif response.url == VTOP_BASE_URL + VTOP_LOGIN_ERROR_URL:
             error_message = find_login_response.login_error_identifier(response.text)
             print(f"Login Credential Error: {error_message}")
-            raise VtopLoginError(f"{error_message}", status_code=401)  # Unauthorized
+            if error_message == "Invalid Captcha":
+                raise VtopCaptchaSolvingError(f"{error_message}", status_code=401)
+            else:
+                raise VtopLoginError(f"{error_message}", status_code=401)
 
         else:
             # Landed on an unexpected page after login POST
