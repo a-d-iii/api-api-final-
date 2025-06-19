@@ -100,7 +100,14 @@ class VtopWeekendOutingError(VitapVtopClientError):
 
 
 class VtopCaptchaError(VtopLoginError):
-    """Raised for errors specifically related to CAPTCHA fetching or solving."""
+    """Raised for errors specifically related to CAPTCHA fetching."""
+
+    def __init__(self, message: str, status_code: int | None = None):
+        super().__init__(message, status_code)
+
+
+class VtopCaptchaSolvingError(VtopLoginError):
+    """Raised for errors specifically related to CAPTCHA solving."""
 
     def __init__(self, message: str, status_code: int | None = None):
         super().__init__(message, status_code)

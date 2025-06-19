@@ -2,6 +2,7 @@ from .exception import (
     VitapVtopClientError,
     VtopConnectionError,
     VtopCaptchaError,
+    VtopCaptchaSolvingError,
     VtopCsrfError,
     VtopLoginError,
     VtopSessionError,

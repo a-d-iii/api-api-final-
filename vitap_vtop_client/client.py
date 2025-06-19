@@ -7,6 +7,7 @@ from .constants import VTOP_BASE_URL
 from .exceptions import (
     VtopLoginError,
     VtopCaptchaError,
+    VtopCaptchaSolvingError,
     VtopConnectionError,
     VtopSessionError,
     VitapVtopClientError,
@@ -127,6 +128,13 @@ class VtopClient:
                 if attempt == self.max_login_retries - 1:
                     raise
                 await asyncio.sleep(1)  # Wait a bit before retrying captcha
+
+            except VtopCaptchaSolvingError as e:
+                print(f"VtopClient: Captcha solving failed during login: {e}")
+                if attempt == self.captcha_retries - 1:
+                    raise
+                await asyncio.sleep(1)  # Wait a bit before retrying captcha
+
             except VtopLoginError as e:  # Typically for bad credentials
                 print(
                     f"VtopClient: Login failed due to invalid credentials or format: {e}"
