@@ -121,6 +121,13 @@ Fetches attendance data for the specified semester.
         print(f"Course: {course_attendance.course_name}, Percentage: {course_attendance.attendance_percentage}%")
     ```
 
+#### `get_all_attendance()`
+Fetches attendance for all semesters defined in `SemSubID`.
+
+-   **Returns:** `dict[str, list[AttendanceModel]]` - Attendance mapped by semester name.
+
+This method is primarily used by the CLI when the `profile` command is invoked without `--sem`.
+
 #### `get_biometric(date: str)`
 Fetches biometric (entry/exit) logs for a specific date.
 
@@ -187,6 +194,16 @@ Fetches details of the student's assigned mentor.
 #### `get_profile()`
 Fetches the complete student profile, including personal details, mentor information, and grade history.
 
+If called via the CLI with the `profile` command, the library now retrieves
+marks for **all** semesters when no `--sem` argument is supplied. When
+`--sem` is provided, only that specific semester's marks are fetched.
+The resulting marks are attached to the returned `StudentProfileModel` under a
+`marks` dictionary where each key is the semester name.
+Attendance retrieval follows the same logic: when invoked from the CLI without
+`--sem`, attendance for all semesters is fetched and stored in an `attendance`
+dictionary on the profile model. If `--sem` is specified, only that semester's
+attendance is retrieved.
+
 -   **Returns:** `StudentProfileModel` - An object containing comprehensive student profile data.
 -   **Raises:** `VtopLoginError`, `VtopSessionError`, `VtopConnectionError`, `VtopParsingError`, `VtopProfileError`.
 -   **Example:**
@@ -222,6 +239,11 @@ Fetches all the available exam schedules for the specified semester.
 
 #### `get_marks(sem_sub_id: str)`
 Fetches available marks for the specified semester.
+
+Before the marks can be retrieved, the library now performs two additional
+requests to the **Student Time Table** page to set the desired semester
+context. This mimics the manual workflow on VTOP where a user selects the
+semester in the timetable section prior to viewing marks.
 
 -   **Parameters:**
     -   `sem_sub_id` (str): The semester ID. See [Semester IDs](#semester-ids-sem_sub_id).
@@ -288,7 +310,7 @@ Refer to the model definitions in:
 
 -   [`vitap_vtop_client/mentor/model/mentor_model.py`](vitap_vtop_client/mentor/model/mentor_model.py) for `MentorModel`
 
--   [`vitap_vtop_client/profile/model/profile_model.py`](vitap_vtop_client/profile/model/profile_model.py) for `StudentProfileModel`
+-   [`vitap_vtop_client/profile/model/profile_model.py`](vitap_vtop_client/profile/model/profile_model.py) for `StudentProfileModel` (includes `marks` and `attendance` dictionaries)
 
 -   [`vitap_vtop_client/login/model/login_model.py`](vitap_vtop_client/login/model/login_model.py) for `LoggedInStudent`
 
