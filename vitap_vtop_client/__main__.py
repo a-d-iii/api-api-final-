@@ -1,6 +1,7 @@
 import asyncio
 import argparse
 from getpass import getpass
+ 
 from typing import Any
 
 from .client import VtopClient
@@ -33,7 +34,7 @@ def _print_lines(obj: Any, indent: int = 0) -> None:
             _print_lines(item, indent)
     else:
         print(f"{prefix}{obj}")
-
+ 
 async def main():
     parser = argparse.ArgumentParser(description="Command line interface for vitap_vtop_client")
     parser.add_argument("registration_number", help="Your VTOP registration number")
@@ -67,7 +68,9 @@ async def main():
         else:
             parser.error("Unknown command")
 
+ 
         _print_lines(data)
+ 
 
 if __name__ == "__main__":
     asyncio.run(main())
