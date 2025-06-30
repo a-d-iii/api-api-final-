@@ -266,7 +266,7 @@ class VtopClient:
             csrf_token=logged_in_info.post_login_csrf_token,
         )
 
-    async def get_profile(self) -> StudentProfileModel:
+    async def get_profile(self, include_timetables: bool = False) -> StudentProfileModel:
         """
         Fetches profile data for the given registration_number.
 
@@ -278,6 +278,7 @@ class VtopClient:
             client=self._client,
             registration_number=logged_in_info.registration_number,
             csrf_token=logged_in_info.post_login_csrf_token,
+            include_timetables=include_timetables,
         )
 
     async def get_exam_schedule(self, sem_sub_id: str) -> ExamScheduleModel:
