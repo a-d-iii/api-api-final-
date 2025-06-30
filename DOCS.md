@@ -187,24 +187,18 @@ Fetches details of the student's assigned mentor.
 #### `get_profile()`
 Fetches the complete student profile, including personal details, mentor information, and grade history.
 
--   **Parameters:**
-    -   `include_timetables` (bool, optional): Fetch timetables for all semesters.
-    -   `include_academic_headings` (bool, optional): Include all heading text from the VTOP content page.
 -   **Returns:** `StudentProfileModel` - An object containing comprehensive student profile data.
 -   **Raises:** `VtopLoginError`, `VtopSessionError`, `VtopConnectionError`, `VtopParsingError`, `VtopProfileError`.
 -   **Example:**
     ```python
     # ... inside async with VtopClient ...
-    profile = await client.get_profile(include_academic_headings=True)
+    profile = await client.get_profile()
     print(f"Name: {profile.student_name}")
     print(f"Email: {profile.email}")
     if profile.mentor_details:
         print(f"Mentor: {profile.mentor_details.faculty_name}")
     if profile.grade_history:
         print(f"CGPA: {profile.grade_history.cgpa}")
-    if profile.academic_headings:
-        for item in profile.academic_headings:
-            print(item)
     # Access profile.base64_pfp for the profile picture
     ```
 
