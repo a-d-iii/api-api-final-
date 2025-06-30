@@ -22,6 +22,7 @@ def parse_student_profile(html: str) -> StudentProfileModel :
 
         profile_data = {
             "base64_pfp": extract_pfp_base64(html),
+            "headings": [h.get_text(strip=True) for h in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])],
         }
 
         for i in range(len(user_data)):
@@ -39,7 +40,7 @@ def parse_student_profile(html: str) -> StudentProfileModel :
             elif text == "EMAIL":
                 profile_data["email"] = user_data[i+1].get_text().strip()
 
-        return StudentProfileModel(**profile_data, grade_history=None,mentor_details=None)
+        return StudentProfileModel(**profile_data, grade_history=None, mentor_details=None)
 
     except Exception as e:
         raise VtopParsingError(f"Failed to parse biometric data: {e}")
