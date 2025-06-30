@@ -2,13 +2,7 @@ from datetime import datetime, timezone
 import time
 import httpx
 from typing import Union
-from vitap_vtop_client.constants import (
-    MARKS_URL,
-    VIEW_MARKS_URL,
-    TIME_TABLE_URL,
-    GET_TIME_TABLE_URL,
-    HEADERS,
-)
+from vitap_vtop_client.constants import MARKS_URL, VIEW_MARKS_URL, HEADERS
 from vitap_vtop_client.marks.model.marks_model import MarksModel
 from vitap_vtop_client.parsers.marks_parser import parse_marks
 from vitap_vtop_client.exceptions.exception import (
@@ -41,23 +35,6 @@ async def fetch_marks(
         VtopAttendanceError: If unexpected or parsing errors occur.
     """
     try:
-        # Initialize timetable view to set semester context
-        init_tt_data = {
-            "verifyMenu": "true",
-            "authorizedID": registration_number,
-            "_csrf": csrf_token,
-            "nocache": int(round(time.time() * 1000)),
-        }
-        await client.post(TIME_TABLE_URL, data=init_tt_data, headers=HEADERS)
-
-        select_sem_data = {
-            "_csrf": csrf_token,
-            "semesterSubId": semSubID,
-            "authorizedID": registration_number,
-            "x": datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT"),
-        }
-        await client.post(GET_TIME_TABLE_URL, data=select_sem_data, headers=HEADERS)
-
         init_data = {
             "verifyMenu": "true",
             "authorizedID": registration_number,
