@@ -39,6 +39,7 @@ This library is designed as a backend component for applications needing VTOP da
 *   **User Authentication:** Secure login and session management.
 *   **Profile Information:** Retrieve comprehensive student profile details.
 *   **Academic Data:** Access attendance records, timetables, marks, and exam schedules.
+*   **Academic Menu Headings:** Retrieve available links listed under the "ACADEMICS" menu.
 *   **Biometric Logs:** Fetch student biometric entry/exit logs.
 *   **Contact Details:** View mentor, HOD, and Dean information.
 *   **Financial Information:** Check pending payments and download receipts.
