@@ -1,1 +1,0 @@
-from .academic_headings import fetch_academic_headings
