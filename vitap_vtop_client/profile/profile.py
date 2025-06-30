@@ -7,6 +7,7 @@ from vitap_vtop_client.grade_history import fetch_grade_history
 from vitap_vtop_client.parsers.profile_parser import parse_student_profile
 from .model import StudentProfileModel
 from vitap_vtop_client.timetable import fetch_timetable
+from vitap_vtop_client.academic_headings import fetch_academic_headings
 
 from vitap_vtop_client.exceptions import VtopConnectionError, VtopProfileError, VtopParsingError
 
@@ -15,6 +16,7 @@ async def fetch_profile(
     registration_number: str,
     csrf_token: str,
     include_timetables: bool = False,
+    include_academic_headings: bool = False,
 ) -> StudentProfileModel:
     """
     Retrieves and compiles the student profile information from the VTOP Portal.
@@ -24,11 +26,14 @@ async def fetch_profile(
         registration_number (str): The student's username.
         csrf_token (str): CSRF token for authentication.
         include_timetables (bool): When True, fetches timetable for all semesters.
+        include_academic_headings (bool): When True, fetches headings from the VTOP content page.
 
     Returns:
         StudentProfileModel: The student's profile information. If
         include_timetables is True, the profile will include timetable
-        information for all semesters available in ``SemSubID``.
+        information for all semesters available in ``SemSubID``. If
+        ``include_academic_headings`` is True, ``academic_headings`` will
+        contain the list of headings from the content page.
 
     Raises:
         VtopConnectionError: If an HTTP request fails.
@@ -69,6 +74,9 @@ async def fetch_profile(
                     profile.timetables[name] = await task
                 except Exception:
                     profile.timetables[name] = None
+
+        if include_timetables or include_academic_headings:
+            profile.academic_headings = await fetch_academic_headings(client)
 
         return profile
 
