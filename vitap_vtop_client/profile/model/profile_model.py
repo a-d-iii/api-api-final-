@@ -19,3 +19,4 @@ class StudentProfileModel(BaseModel):
     mentor_details: Optional[MentorModel]
     timetables: Optional[Dict[str, TimetableModel]] = None
     headings: Optional[List[str]] = None
+    academic_headings: Optional[List[str]] = None
