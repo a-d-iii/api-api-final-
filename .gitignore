@@ -1,3 +1,7 @@
 **/__pycache__/
 **/.DS_Store
 test.py
+poetry.lock
+.devenv
+devenv.lock
+.devenv.flake.nix
