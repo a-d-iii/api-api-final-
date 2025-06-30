@@ -5,6 +5,7 @@ from getpass import getpass
 from typing import Any
 
 from .client import VtopClient
+from .constants import SemSubID
 
 
 def _shorten(value: str, max_length: int = 40) -> str:
@@ -17,10 +18,16 @@ def _shorten(value: str, max_length: int = 40) -> str:
 def _print_lines(obj: Any, indent: int = 0) -> None:
     """Recursively print dictionaries/lists with each entry on its own line."""
     prefix = " " * indent
-    if hasattr(obj, "dict"):
+
+    if hasattr(obj, "model_dump"):
+        obj = obj.model_dump(exclude_none=True)
+    elif hasattr(obj, "dict"):
         obj = obj.dict(exclude_none=True)
 
     if isinstance(obj, dict):
+        if list(obj.keys()) == ["root"]:
+            _print_lines(obj["root"], indent)
+            return
         for key, value in obj.items():
             if isinstance(value, (dict, list)):
                 print(f"{prefix}{key}:")
@@ -49,6 +56,11 @@ async def main():
     async with VtopClient(args.registration_number, password) as client:
         if args.command == "profile":
             data = await client.get_profile(include_timetables=True)
+            sem_id = args.sem_sub_id or SemSubID.get("FALL SEM 2024-25")
+            try:
+                data.marks = await client.get_marks(sem_id)
+            except Exception as e:
+                print(f"Failed to fetch marks: {e}")
         elif args.command == "attendance":
             if not args.sem_sub_id:
                 parser.error("attendance command requires --sem")
@@ -70,6 +82,13 @@ async def main():
 
  
         _print_lines(data)
+
+        if args.command == "profile":
+            if data.marks is None:
+                print("Marks: not retrieved")
+            elif hasattr(data.marks, "root") and not data.marks.root:
+                print("Marks: []")
+
  
 
 if __name__ == "__main__":
