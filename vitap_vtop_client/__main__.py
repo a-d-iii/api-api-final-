@@ -48,7 +48,7 @@ async def main():
 
     async with VtopClient(args.registration_number, password) as client:
         if args.command == "profile":
-            data = await client.get_profile()
+            data = await client.get_profile(include_timetables=True)
         elif args.command == "attendance":
             if not args.sem_sub_id:
                 parser.error("attendance command requires --sem")

@@ -1,17 +1,20 @@
 import httpx
 import time
-from vitap_vtop_client.constants import PROFILE_URL, HEADERS
+import asyncio
+from vitap_vtop_client.constants import PROFILE_URL, HEADERS, SemSubID
 from vitap_vtop_client.mentor import fetch_mentor_info
 from vitap_vtop_client.grade_history import fetch_grade_history
 from vitap_vtop_client.parsers.profile_parser import parse_student_profile
 from .model import StudentProfileModel
+from vitap_vtop_client.timetable import fetch_timetable
 
 from vitap_vtop_client.exceptions import VtopConnectionError, VtopProfileError, VtopParsingError
 
 async def fetch_profile(
     client: httpx.AsyncClient,
     registration_number: str,
-    csrf_token: str
+    csrf_token: str,
+    include_timetables: bool = False,
 ) -> StudentProfileModel:
     """
     Retrieves and compiles the student profile information from the VTOP Portal.
@@ -20,9 +23,12 @@ async def fetch_profile(
         client (httpx.AsyncClient): The async HTTP client.
         registration_number (str): The student's username.
         csrf_token (str): CSRF token for authentication.
+        include_timetables (bool): When True, fetches timetable for all semesters.
 
     Returns:
-        StudentProfileModel: The student's profile information.
+        StudentProfileModel: The student's profile information. If
+        include_timetables is True, the profile will include timetable
+        information for all semesters available in ``SemSubID``.
 
     Raises:
         VtopConnectionError: If an HTTP request fails.
@@ -44,7 +50,26 @@ async def fetch_profile(
         profile = parse_student_profile(response.text)
         profile.grade_history = await fetch_grade_history(client, registration_number, csrf_token)
         profile.mentor_details = await fetch_mentor_info(client, registration_number, csrf_token)
-        
+
+        if include_timetables:
+            profile.timetables = {}
+            tasks = {
+                name: asyncio.create_task(
+                    fetch_timetable(
+                        client=client,
+                        username=registration_number,
+                        semSubID=sem_id,
+                        csrf_token=csrf_token,
+                    )
+                )
+                for name, sem_id in SemSubID.items()
+            }
+            for name, task in tasks.items():
+                try:
+                    profile.timetables[name] = await task
+                except Exception:
+                    profile.timetables[name] = None
+
         return profile
 
     except VtopParsingError as e:

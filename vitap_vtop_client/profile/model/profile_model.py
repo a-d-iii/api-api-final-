@@ -1,5 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, List
+
+from vitap_vtop_client.timetable.model import TimetableModel
 
 from vitap_vtop_client.grade_history import GradeHistoryModel
 from vitap_vtop_client.mentor import MentorModel
@@ -15,3 +17,5 @@ class StudentProfileModel(BaseModel):
     base64_pfp: Optional[str]
     grade_history: Optional[GradeHistoryModel]
     mentor_details: Optional[MentorModel]
+    timetables: Optional[Dict[str, TimetableModel]] = None
+    headings: Optional[List[str]] = None
