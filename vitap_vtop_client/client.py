@@ -21,7 +21,7 @@ from .login import (
     LoggedInStudent,
 )
 
-from .utils import solve_captcha
+from .utils import solve_captcha, fetch_current_sem_sub_id
 
 from .attendance import fetch_attendance, AttendanceModel
 from .biometric import fetch_biometric, BiometricModel
@@ -84,6 +84,7 @@ class VtopClient:
         self.max_login_retries = max_login_retries
         self.captcha_retries = captcha_retries
         self._login_lock = asyncio.Lock()  # Prevents concurrent login attempts
+        self._current_sem_sub_id: str | None = None
 
     async def _perform_login_sequence(self) -> LoggedInStudent:
         """
@@ -167,6 +168,19 @@ class VtopClient:
         # Check if already logged in and session is potentially valid
         if self._logged_in_student is not None:
             return self._logged_in_student
+
+    async def _get_current_sem_sub_id(self) -> str:
+        """Fetch and cache the current semesterSubId from VTOP."""
+        if self._current_sem_sub_id:
+            return self._current_sem_sub_id
+        logged_in_info = await self._ensure_logged_in()
+        sem_sub_id = await fetch_current_sem_sub_id(
+            client=self._client,
+            registration_number=logged_in_info.registration_number,
+            csrf_token=logged_in_info.post_login_csrf_token,
+        )
+        self._current_sem_sub_id = sem_sub_id
+        return sem_sub_id
 
         async with self._login_lock:
             # Double-check after acquiring the lock, in case another coroutine logged in
@@ -280,7 +294,7 @@ class VtopClient:
             csrf_token=logged_in_info.post_login_csrf_token,
         )
 
-    async def get_exam_schedule(self, sem_sub_id: str) -> ExamScheduleModel:
+    async def get_exam_schedule(self, sem_sub_id: str | None = None) -> ExamScheduleModel:
         """
         Fetches all exam schedules for the given semester.
 
@@ -288,6 +302,7 @@ class VtopClient:
             A ExamScheduleModel containing the parsed exam schedule details.
         """
         logged_in_info = await self._ensure_logged_in()
+        sem_sub_id = sem_sub_id or await self._get_current_sem_sub_id()
         return await fetch_exam_schedule(
             client=self._client,
             registration_number=logged_in_info.registration_number,
@@ -295,7 +310,7 @@ class VtopClient:
             semSubID=sem_sub_id,
         )
 
-    async def get_marks(self, sem_sub_id: str) -> MarksModel:
+    async def get_marks(self, sem_sub_id: str | None = None) -> MarksModel:
         """
         Fetches all marks for the given semester.
 
@@ -303,6 +318,7 @@ class VtopClient:
             A MarksModel containing the parsed mark details.
         """
         logged_in_info = await self._ensure_logged_in()
+        sem_sub_id = sem_sub_id or await self._get_current_sem_sub_id()
         return await fetch_marks(
             client=self._client,
             registration_number=logged_in_info.registration_number,
