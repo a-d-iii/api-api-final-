@@ -2,7 +2,7 @@ from typing import List
 import httpx
 import asyncio
 
-from .constants import VTOP_BASE_URL
+from .constants import VTOP_BASE_URL, SemSubID
 
 from .exceptions import (
     VtopLoginError,
@@ -266,7 +266,9 @@ class VtopClient:
             csrf_token=logged_in_info.post_login_csrf_token,
         )
 
-    async def get_profile(self, include_timetables: bool = False) -> StudentProfileModel:
+    async def get_profile(
+        self, include_timetables: bool = False
+    ) -> StudentProfileModel:
         """
         Fetches profile data for the given registration_number.
 
@@ -310,6 +312,28 @@ class VtopClient:
             csrf_token=logged_in_info.post_login_csrf_token,
             semSubID=sem_sub_id,
         )
+
+    async def get_all_marks(self) -> dict[str, MarksModel]:
+        """Fetch marks for all semesters defined in ``SemSubID``."""
+        logged_in_info = await self._ensure_logged_in()
+        tasks = {
+            name: asyncio.create_task(
+                fetch_marks(
+                    client=self._client,
+                    registration_number=logged_in_info.registration_number,
+                    csrf_token=logged_in_info.post_login_csrf_token,
+                    semSubID=sem_id,
+                )
+            )
+            for name, sem_id in SemSubID.items()
+        }
+        results: dict[str, MarksModel] = {}
+        for name, task in tasks.items():
+            try:
+                results[name] = await task
+            except Exception:
+                results[name] = MarksModel(root=[])
+        return results
 
     async def get_weekend_outing_requests(self) -> WeekendOutingModel:
         """
