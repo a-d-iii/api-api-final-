@@ -37,12 +37,8 @@ async def fetch_timetable(
             "_csrf": csrf_token,
             "nocache": int(round(time.time() * 1000)),
         }
-        initial_response = await client.post(
-            TIME_TABLE_URL, data=data_initial, headers=HEADERS
-        )
+        initial_response = await client.post(TIME_TABLE_URL, data=data_initial, headers=HEADERS)
         initial_response.raise_for_status()
-        if "not authorized" in initial_response.text:
-            raise VtopTimetableError("Not authorized to access timetable page")
     
     except httpx.RequestError as e:
         print(f"Timetable initial POST failed: {e}")
@@ -63,17 +59,11 @@ async def fetch_timetable(
             "authorizedID": username,
             "x": datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT"),
         }
-        timetable_response = await client.post(
-            GET_TIME_TABLE_URL, data=data_fetch, headers=HEADERS
-        )
+        timetable_response = await client.post(GET_TIME_TABLE_URL, data=data_fetch, headers=HEADERS)
         timetable_response.raise_for_status()
-        if "Technical Error" in timetable_response.text:
-            raise VtopTimetableError("Technical error while fetching timetable")
 
         # Parse the response
         parsed_data = timetable_parser.parse_time_table(timetable_response.text)
-        if all(not getattr(parsed_data, day) for day in parsed_data.__fields__):
-            raise VtopTimetableError("Timetable not available")
         return parsed_data
 
     except VtopParsingError as e:
