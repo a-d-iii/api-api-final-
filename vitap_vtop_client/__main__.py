@@ -5,6 +5,7 @@ from getpass import getpass
 from typing import Any
 
 from .client import VtopClient
+from .utils import get_semester_name
 
 
 def _shorten(value: str, max_length: int = 40) -> str:
@@ -38,7 +39,21 @@ def _print_lines(obj: Any, indent: int = 0) -> None:
 async def main():
     parser = argparse.ArgumentParser(description="Command line interface for vitap_vtop_client")
     parser.add_argument("registration_number", help="Your VTOP registration number")
-    parser.add_argument("command", choices=["profile", "attendance", "timetable", "biometric", "grade_history", "mentor"], help="Which information to fetch")
+    parser.add_argument(
+        "command",
+        choices=[
+            "profile",
+            "attendance",
+            "timetable",
+            "biometric",
+            "grade_history",
+            "mentor",
+            "exam_schedule",
+            "marks",
+            "current_semester",
+        ],
+        help="Which information to fetch",
+    )
     parser.add_argument("--password", dest="password", help="VTOP password (will prompt if omitted)")
     parser.add_argument("--sem", dest="sem_sub_id", help="Semester subject ID for semester specific commands")
     parser.add_argument("--date", dest="date", help="Date for biometric in dd/mm/yyyy format")
@@ -49,6 +64,11 @@ async def main():
     async with VtopClient(args.registration_number, password) as client:
         if args.command == "profile":
             data = await client.get_profile()
+            current_sem = await client.get_current_sem_sub_id()
+            sem_name = get_semester_name(current_sem) or current_sem
+            data = data.dict(exclude_none=True)
+            data["current_semester"] = sem_name
+            data["current_sem_sub_id"] = current_sem
         elif args.command == "attendance":
             if not args.sem_sub_id:
                 parser.error("attendance command requires --sem")
@@ -65,6 +85,17 @@ async def main():
             data = await client.get_grade_history()
         elif args.command == "mentor":
             data = await client.get_mentor()
+        elif args.command == "exam_schedule":
+            data = await client.get_exam_schedule(args.sem_sub_id)
+        elif args.command == "marks":
+            data = await client.get_marks(args.sem_sub_id)
+        elif args.command == "current_semester":
+            current_sem = await client.get_current_sem_sub_id()
+            sem_name = get_semester_name(current_sem) or current_sem
+            data = {
+                "current_semester": sem_name,
+                "current_sem_sub_id": current_sem,
+            }
         else:
             parser.error("Unknown command")
 
