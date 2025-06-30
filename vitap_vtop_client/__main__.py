@@ -5,7 +5,6 @@ from getpass import getpass
 from typing import Any
 
 from .client import VtopClient
-from .constants import SemSubID
 
 
 def _shorten(value: str, max_length: int = 40) -> str:
@@ -50,11 +49,6 @@ async def main():
     async with VtopClient(args.registration_number, password) as client:
         if args.command == "profile":
             data = await client.get_profile(include_timetables=True)
-            sem_id = args.sem_sub_id or SemSubID.get("FALL SEM 2024-25")
-            try:
-                data.marks = await client.get_marks(sem_id)
-            except Exception as e:
-                print(f"Failed to fetch marks: {e}")
         elif args.command == "attendance":
             if not args.sem_sub_id:
                 parser.error("attendance command requires --sem")
