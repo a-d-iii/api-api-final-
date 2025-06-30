@@ -12,5 +12,30 @@ from .exception import (
     VtopTimetableError,
     VtopMentorError,
     VtopGradeHistoryError,
-    VtopProfileError
+    VtopProfileError,
+    VtopExamScheduleError,
+    VtopMarksError,
+    VtopGeneralOutingError,
+    VtopWeekendOutingError,
 )
+
+__all__ = [
+    "VitapVtopClientError",
+    "VtopConnectionError",
+    "VtopCaptchaError",
+    "VtopCaptchaSolvingError",
+    "VtopCsrfError",
+    "VtopLoginError",
+    "VtopSessionError",
+    "VtopParsingError",
+    "VtopAttendanceError",
+    "VtopBiometricError",
+    "VtopTimetableError",
+    "VtopMentorError",
+    "VtopGradeHistoryError",
+    "VtopProfileError",
+    "VtopExamScheduleError",
+    "VtopMarksError",
+    "VtopGeneralOutingError",
+    "VtopWeekendOutingError",
+]
